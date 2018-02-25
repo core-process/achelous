@@ -1,8 +1,11 @@
 #!/bin/bash
-set -e
 
 # setup environment
 export GOPATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo "> setting GOPATH=\"$GOPATH\""
 
 # run default shell
-eval "$(getent passwd "$USER" | awk -F: '{print $NF}')"
+USER_SHELL="$(getent passwd "$USER" | awk -F: '{print $NF}')"
+echo "> opening workspace with shell $USER_SHELL..."
+eval "$USER_SHELL"
+echo "> workspace closed with code $?"
