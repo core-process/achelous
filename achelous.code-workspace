@@ -9,6 +9,12 @@
 		"go.toolsGopath": "${workspaceFolder}/.gotools",
 		"terminal.integrated.env.linux": {
 			"GOPATH": "${workspaceFolder}"
+		},
+		"terminal.integrated.env.osx": {
+			"GOPATH": "${workspaceFolder}"
+		},
+		"terminal.integrated.env.windows": {
+			"GOPATH": "${workspaceFolder}"
 		}
 	}
 }
