@@ -5,7 +5,10 @@
 		}
 	],
 	"settings": {
-		"go.inferGopath": true,
-		"go.toolsGopath": "${workspaceRoot}/.gotools"
+		"go.gopath": "${workspaceFolder}",
+		"go.toolsGopath": "${workspaceFolder}/.gotools",
+		"terminal.integrated.env.linux": {
+			"GOPATH": "${workspaceFolder}"
+		}
 	}
 }
