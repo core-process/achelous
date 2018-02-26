@@ -2,6 +2,8 @@ package main
 
 import "time"
 
+// See https://www.sendmail.org/~ca/email/man/sendmail.html for more.
+
 //      -Btype      Set the body type to type. Current legal values 7BIT or
 //                  8BITMIME.
 type argB int8
@@ -56,11 +58,11 @@ type argO struct {
 	_AliasFile *string
 	//      HoldExpensive
 	//                  On mailers that are considered ``expensive'' to connect to,
-	//                  don't initiate immediate connection.  This requires queueing.
+	//                  don't initiate immediate connection. This requires queueing.
 	_HoldExpensive bool
 	//      CheckpointInterval=N
 	//                  Checkpoint the queue file after every N successful deliveries
-	//                  (default 10).  This avoids excessive duplicate deliveries
+	//                  (default 10). This avoids excessive duplicate deliveries
 	//                  when sending to long mailing lists interrupted by system
 	//                  crashes.
 	_CheckpointInterval *int8
@@ -71,18 +73,20 @@ type argO struct {
 	//                  ery is done the next time the queue is run, and `d' for de-
 	//                  ferred - the same as `q' except that database lookups (no-
 	//                  tably DNS and NIS lookups) are avoided.
-	_DeliveryMode rune // TODO
+	// TODO: fix data type
+	_DeliveryMode *rune
 	//      ErrorMode=x
 	//                  Set error processing to mode x. Valid modes are `m' to mail
 	//                  back the error message, `w' to ``write'' back the error mes-
 	//                  sage (or mail it back if the sender is not logged in), `p' to
 	//                  print the errors on the terminal (default), `q' to throw away
 	//                  error messages (only exit status is returned), and `e' to do
-	//                  special processing for the BerkNet.  If the text of the mes-
+	//                  special processing for the BerkNet. If the text of the mes-
 	//                  sage is not mailed back by modes `m' or `w' and if the sender
 	//                  is local to this machine, a copy of the message is appended
 	//                  to the file dead.letter in the sender's home directory.
-	_ErrorMode rune // TODO
+	// TODO: fix data type
+	_ErrorMode *rune
 	//      SaveFromLine
 	//                  Save UNIX-style From lines at the front of messages.
 	_SaveFromLine bool
@@ -94,7 +98,7 @@ type argO struct {
 	//                  nator.
 	_IgnoreDots bool
 	//      SendMimeErrors
-	//                  Send error messages in MIME format.  If not set, the DSN (De-
+	//                  Send error messages in MIME format. If not set, the DSN (De-
 	//                  livery Status Notification) SMTP extension is disabled.
 	_SendMimeErrors bool
 	//      ConnectionCacheTimeout=timeout
@@ -113,9 +117,9 @@ type argO struct {
 	//                  es(1) command.
 	_CheckAliases bool
 	//      OldStyleHeaders
-	//                  If set, this message may have old style headers.  If not set,
+	//                  If set, this message may have old style headers. If not set,
 	//                  this message is guaranteed to have new style headers (i.e.,
-	//                  commas instead of spaces between addresses).  If set, an
+	//                  commas instead of spaces between addresses). If set, an
 	//                  adaptive algorithm is used that will correctly determine the
 	//                  header format in most cases.
 	_OldStyleHeaders bool
@@ -127,20 +131,20 @@ type argO struct {
 	_StatusFile *string
 	//      Timeout.queuereturn=time
 	//                  Set the timeout on undelivered messages in the queue to the
-	//                  specified time.  After delivery has failed (e.g., because of
+	//                  specified time. After delivery has failed (e.g., because of
 	//                  a host being down) for this amount of time, failed messages
-	//                  will be returned to the sender.  The default is five days.
+	//                  will be returned to the sender. The default is five days.
 	_TimeoutQueueReturn *time.Time
 	//      UserDatabaseSpec=userdatabase
 	//                  If set, a user database is consulted to get forwarding infor-
-	//                  mation.  You can consider this an adjunct to the aliasing
+	//                  mation. You can consider this an adjunct to the aliasing
 	//                  mechanism, except that the database is intended to be dis-
-	//                  tributed; aliases are local to a particular host.  This may
+	//                  tributed; aliases are local to a particular host. This may
 	//                  not be available if your sendmail does not have the USERDB
 	//                  option compiled in.
 	_UserDatabaseSpec *string
 	//      ForkEachJob
-	//                  Fork each job during queue runs.  May be convenient on memo-
+	//                  Fork each job during queue runs. May be convenient on memo-
 	//                  ry-poor machines.
 	_ForkEachJob bool
 	//      SevenBitInput
@@ -151,7 +155,8 @@ type argO struct {
 	//                  to mode: m (mimefy) will convert to seven-bit MIME format, p
 	//                  (pass) will pass it as eight bits (but violates protocols),
 	//                  and s (strict) will bounce the message.
-	_EightBitMode rune // TODO
+	// TODO: fix data type
+	_EightBitMode *rune
 	//      MinQueueAge=timeout
 	//                  Sets how long a job must ferment in the queue between at-
 	//                  tempts to send it.
@@ -162,7 +167,7 @@ type argO struct {
 	_DefaultCharSet *string
 	//      DialDelay=sleeptime
 	//                  If opening a connection fails, sleep for sleeptime seconds
-	//                  and try again.  Useful on dial-on-demand sites.
+	//                  and try again. Useful on dial-on-demand sites.
 	_DialDelay *time.Duration
 	//      NoRecipientAction=action
 	//                  Set the behaviour when there are no recipient headers (To:,
@@ -172,7 +177,8 @@ type argO struct {
 	//                  with the envelope recipients, add-bcc adds an empty Bcc:
 	//                  header, and add-to-undisclosed adds a header reading `To:
 	//                  undisclosed-recipients:;'.
-	_NoRecipientAction *string // TODO
+	// TODO: fix data type
+	_NoRecipientAction *string
 	//      MaxDaemonChildren=N
 	//                  Sets the maximum number of children that an incoming SMTP
 	//                  daemon will allow to spawn at any time to N.
