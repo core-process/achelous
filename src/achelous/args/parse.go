@@ -1,6 +1,7 @@
 package args
 
 import (
+	"fmt"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -70,12 +71,18 @@ func Parse(argv []string) Args {
 					lookup = "*" + config[ci].field.Type.Elem().Name()
 				}
 
-				reflect.
-					ValueOf(assignements[lookup]).
-					Call([]reflect.Value{
-						reflect.ValueOf(source),
-						config[ci].value.Addr(),
-					})
+				err, _ :=
+					reflect.
+						ValueOf(assignements[lookup]).
+						Call([]reflect.Value{
+							reflect.ValueOf(source),
+							config[ci].value.Addr(),
+						})[0].
+						Interface().(error)
+
+				if err != nil {
+					fmt.Println("Error while parsing " + config[ci].name + ": " + err.Error())
+				}
 			}
 
 			switch config[ci]._type {
