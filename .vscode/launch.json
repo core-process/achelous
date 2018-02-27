@@ -12,9 +12,7 @@
             "port": 2345,
             "host": "127.0.0.1",
             "program": "${workspaceFolder}/src/achelous",
-            "env": {
-                "GOPATH": "${workspaceFolder}/.gotools"
-            },
+            "env": {},
             "args": [],
             "showLog": true
         }

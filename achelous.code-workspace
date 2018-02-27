@@ -5,8 +5,8 @@
 		}
 	],
 	"settings": {
+		// Set GOPATH to workspace directory
 		"go.gopath": "${workspaceFolder}",
-		"go.toolsGopath": "${workspaceFolder}/.gotools",
 		"terminal.integrated.env.linux": {
 			"GOPATH": "${workspaceFolder}"
 		},
@@ -15,6 +15,9 @@
 		},
 		"terminal.integrated.env.windows": {
 			"GOPATH": "${workspaceFolder}"
-		}
+		},
+		// Set path to required Go tools
+		// Add ~/.gotools/bin to your PATH and restart Visual Studio Code
+		"go.toolsGopath": "~/.gotools"
 	}
 }
