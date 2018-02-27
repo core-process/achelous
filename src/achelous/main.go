@@ -2,10 +2,13 @@ package main
 
 import (
 	"achelous/args"
-	"fmt"
+	"os"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 func main() {
-	var a = args.Parse(make([]string, 0))
-	fmt.Printf("%+v\n", a)
+	spew.Dump(os.Args)
+	var a = args.Parse(os.Args)
+	spew.Dump(a)
 }

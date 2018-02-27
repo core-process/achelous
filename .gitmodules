@@ -1,0 +1,3 @@
+[submodule "src/github.com/davecgh/go-spew"]
+	path = src/github.com/davecgh/go-spew
+	url = https://github.com/davecgh/go-spew.git
