@@ -31,8 +31,8 @@ const (
 //             This can be a simple protocol name such as ``UUCP'' or a pro-
 //             tocol and hostname, such as ``UUCP:ucbvax''.
 type Arg_p struct {
-	protocol string
-	hostname *string
+	Protocol string
+	Hostname *string
 }
 
 // -R return   Set the amount of the message to be returned if the message
