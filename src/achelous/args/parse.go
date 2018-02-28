@@ -19,7 +19,6 @@ const (
 type argConf struct {
 	name  string
 	_type argType
-	field reflect.StructField
 	value reflect.Value
 }
 
@@ -33,10 +32,10 @@ func Parse(argv []string) Args {
 	config := make([]argConf, argsValue.NumField())
 
 	for i := 0; i < argsType.NumField(); i++ {
-		config[i].field = argsType.Field(i)
-		config[i].value = argsValue.FieldByName(config[i].field.Name)
-		config[i].name = "-" + config[i].field.Name[len("Arg_"):]
-		switch config[i].field.Tag.Get("args") {
+		field := argsType.Field(i)
+		config[i].value = argsValue.FieldByName(field.Name)
+		config[i].name = "-" + field.Name[len("Arg_"):]
+		switch field.Tag.Get("args") {
 		case "program":
 			config[i]._type = argTypeProgram
 		case "attachedValue":
@@ -65,21 +64,7 @@ func Parse(argv []string) Args {
 		for ci := 0; ci < len(config); ci++ {
 
 			assignValue := func(source string) {
-
-				lookup := config[ci].field.Type.Name()
-				if config[ci].field.Type.Kind() == reflect.Ptr {
-					lookup = "*" + config[ci].field.Type.Elem().Name()
-				}
-
-				err, _ :=
-					reflect.
-						ValueOf(assignements[lookup]).
-						Call([]reflect.Value{
-							reflect.ValueOf(source),
-							config[ci].value.Addr(),
-						})[0].
-						Interface().(error)
-
+				err := assign(source, config[ci].value)
 				if err != nil {
 					fmt.Println("Error while parsing " + config[ci].name + ": " + err.Error())
 				}
@@ -88,7 +73,7 @@ func Parse(argv []string) Args {
 			switch config[ci]._type {
 			case argTypeFlag:
 				if config[ci].name == argv[ai] {
-					config[ci].value.SetBool(true)
+					assignValue("")
 					break
 				}
 			case argTypeTrailingValue:
