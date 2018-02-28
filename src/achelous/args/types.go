@@ -68,7 +68,7 @@ type Arg_O struct {
 	//             (default 10). This avoids excessive duplicate deliveries
 	//             when sending to long mailing lists interrupted by system
 	//             crashes.
-	Opt_CheckpointInterval *int8
+	Opt_CheckpointInterval *int16
 
 	// DeliveryMode=x
 	//             Set the delivery mode to x. Delivery modes are `i' for inter-
@@ -100,7 +100,7 @@ type Arg_O struct {
 	// MaxHopCount= N
 	//             The maximum number of times a message is allowed to ``hop''
 	//             before we decide it is in a loop.
-	Opt_MaxHopCount *int8
+	Opt_MaxHopCount *int16
 
 	// IgnoreDots  Do not take dots on a line by themselves as a message termi-
 	//             nator.
@@ -113,14 +113,14 @@ type Arg_O struct {
 
 	// ConnectionCacheTimeout=timeout
 	//             Set connection cache timeout.
-	Opt_ConnectionCacheTimeout time.Duration
+	Opt_ConnectionCacheTimeout *time.Duration
 
 	// ConnectionCacheSize=N
 	//             Set connection cache size.
 	Opt_ConnectionCacheSize *int16
 
 	// LogLevel=n  The log level.
-	Opt_LogLevel *int8
+	Opt_LogLevel *int16
 
 	// MeToo       Send to ``me'' (the sender) also if I am in an alias expan-
 	//             sion.
@@ -152,7 +152,7 @@ type Arg_O struct {
 	//             specified time. After delivery has failed (e.g., because of
 	//             a host being down) for this amount of time, failed messages
 	//             will be returned to the sender. The default is five days.
-	Opt_TimeoutQueueReturn *time.Time
+	Opt_TimeoutQueueReturn *time.Duration
 
 	// UserDatabaseSpec=userdatabase
 	//             If set, a user database is consulted to get forwarding infor-
@@ -183,7 +183,7 @@ type Arg_O struct {
 	// MinQueueAge=timeout
 	//             Sets how long a job must ferment in the queue between at-
 	//             tempts to send it.
-	Opt_MinQueueAge time.Duration
+	Opt_MinQueueAge *time.Duration
 
 	// DefaultCharSet=charset
 	//             Sets the default character set used to label 8-bit data that
@@ -273,7 +273,7 @@ type Args struct {
 	Arg_C *string `args:"attachedValue"`
 
 	// -dX         Set debugging value to X.
-	Arg_d *int8 `args:"attachedValue"`
+	Arg_d *int16 `args:"attachedValue"`
 
 	// -Ffullname  Set the full name of the sender.
 	Arg_F *string `args:"attachedValue"`
@@ -289,7 +289,7 @@ type Args struct {
 	//             mail is returned with an error message, the victim of an
 	//             aliasing loop. If not specified, ``Received:'' lines in the
 	//             message are counted.
-	Arg_h *int `args:"attachedValue"`
+	Arg_h *int16 `args:"attachedValue"`
 
 	// -i          Ignore dots alone on lines by themselves in incoming mes-
 	//             sages. This should be set if you are reading data from a
