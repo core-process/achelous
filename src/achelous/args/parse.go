@@ -1,7 +1,7 @@
 package args
 
 import (
-	"fmt"
+	"errors"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -22,7 +22,7 @@ type argConf struct {
 	value reflect.Value
 }
 
-func Parse(argv []string) Args {
+func Parse(argv []string) (*Args, error) {
 	// generate configuration
 	result := Args{}
 
@@ -47,6 +47,14 @@ func Parse(argv []string) Args {
 		}
 	}
 
+	assignValue := func(ci int, source string) error {
+		err := assign(source, config[ci].value)
+		if err != nil {
+			return errors.New("Error while parsing " + config[ci].name + ": " + err.Error())
+		}
+		return nil
+	}
+
 	// parse arguments
 	for ai := 0; ai < len(argv); ai++ {
 		// handle arg0
@@ -54,42 +62,60 @@ func Parse(argv []string) Args {
 			for ci := 0; ci < len(config); ci++ {
 				if config[ci]._type == argTypeProgram {
 					source := filepath.Base(argv[ai])
-					config[ci].value.Set(reflect.ValueOf(&source))
+					err := assignValue(ci, source)
+					if err != nil {
+						return nil, err
+					}
 					break
 				}
 			}
 			continue
 		}
 		// handle regular args
+		handled := false
 		for ci := 0; ci < len(config); ci++ {
-
-			assignValue := func(source string) {
-				err := assign(source, config[ci].value)
-				if err != nil {
-					fmt.Println("Error while parsing " + config[ci].name + ": " + err.Error())
-				}
-			}
-
 			switch config[ci]._type {
 			case argTypeFlag:
 				if config[ci].name == argv[ai] {
-					assignValue("")
+					source := ""
+					err := assignValue(ci, source)
+					if err != nil {
+						return nil, err
+					}
+					handled = true
 					break
 				}
 			case argTypeTrailingValue:
 				if config[ci].name == argv[ai] {
-					assignValue(argv[ai+1])
+					if ai+1 >= len(argv) {
+						return nil, errors.New("Value missing for argument " + argv[ai])
+					}
+					source := argv[ai+1]
+					err := assignValue(ci, source)
+					if err != nil {
+						return nil, err
+					}
+					handled = true
 					ai++
 					break
 				}
 			case argTypeAttachedValue:
 				if strings.HasPrefix(argv[ai], config[ci].name) {
-					assignValue(argv[ai][len(config[ci].name):])
+					source := argv[ai][len(config[ci].name):]
+					err := assignValue(ci, source)
+					if err != nil {
+						return nil, err
+					}
+					handled = true
 					break
 				}
 			}
 		}
+		// verify if argument had been processed
+		if !handled {
+			return nil, errors.New("Unknown argument " + argv[ai])
+		}
 	}
 
-	return result
+	return &result, nil
 }
