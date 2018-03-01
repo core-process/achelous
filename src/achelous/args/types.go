@@ -4,6 +4,14 @@ import "time"
 
 // See https://www.sendmail.org/~ca/email/man/sendmail.html for more.
 
+type Arg_main int8
+
+const (
+	Arg_main_sendmail   Arg_main = 0
+	Arg_main_newaliases Arg_main = 1
+	Arg_main_mailq      Arg_main = 2
+)
+
 // -Btype      Set the body type to type. Current legal values 7BIT or
 //             8BITMIME.
 type Arg_B int8
@@ -218,7 +226,7 @@ type Arg_O struct {
 }
 
 type Args struct {
-	Arg_0 *string `args:"program"`
+	Arg_main *Arg_main `args:"program"`
 
 	// -Btype      Set the body type to type. Current legal values 7BIT or
 	//             8BITMIME.

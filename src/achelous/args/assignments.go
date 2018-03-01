@@ -97,6 +97,20 @@ var assignements = map[string]interface{}{
 		return nil
 	},
 
+	"*Arg_main": func(source string, target **Arg_main) error {
+		var value Arg_main
+		switch source {
+		case "newaliases":
+			value = Arg_main_newaliases
+		case "mailq":
+			value = Arg_main_mailq
+		default:
+			value = Arg_main_sendmail
+		}
+		*target = &value
+		return nil
+	},
+
 	"*Arg_B": func(source string, target **Arg_B) error {
 		var value Arg_B
 		switch source {
