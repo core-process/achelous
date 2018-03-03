@@ -4,21 +4,13 @@ import "time"
 
 // See https://www.sendmail.org/~ca/email/man/sendmail.html for more.
 
-type Arg_main int8
-
-const (
-	Arg_main_sendmail   Arg_main = 0
-	Arg_main_newaliases Arg_main = 1
-	Arg_main_mailq      Arg_main = 2
-)
-
 // -Btype      Set the body type to type. Current legal values 7BIT or
 //             8BITMIME.
-type Arg_B int8
+type SmArg_B int8
 
 const (
-	Arg_B_7Bit     Arg_B = 0
-	Arg_B_8BitMime Arg_B = 1
+	SmArg_B_7Bit     SmArg_B = 0
+	SmArg_B_8BitMime SmArg_B = 1
 )
 
 // -N dsn      Set delivery status notification conditions to dsn, which can
@@ -26,19 +18,19 @@ const (
 //             the values `failure' to be notified if delivery failed,
 //             `delay' to be notified if delivery is delayed, and `success'
 //             to be notified when the message is successfully delivered.
-type Arg_N int8
+type SmArg_N int8
 
 const (
-	Arg_N_Never   Arg_N = 0
-	Arg_N_Failure Arg_N = 1
-	Arg_N_Delay   Arg_N = 2
-	Arg_N_Success Arg_N = 4
+	SmArg_N_Never   SmArg_N = 0
+	SmArg_N_Failure SmArg_N = 1
+	SmArg_N_Delay   SmArg_N = 2
+	SmArg_N_Success SmArg_N = 4
 )
 
 // -pprotocol  Set the name of the protocol used to receive the message.
 //             This can be a simple protocol name such as ``UUCP'' or a pro-
 //             tocol and hostname, such as ``UUCP:ucbvax''.
-type Arg_p struct {
+type SmArg_p struct {
 	Protocol string
 	Hostname *string
 }
@@ -46,11 +38,11 @@ type Arg_p struct {
 // -R return   Set the amount of the message to be returned if the message
 //             bounces. The return parameter can be `full' to return the
 //             entire message or `hdrs' to return only the headers.
-type Arg_R int8
+type SmArg_R int8
 
 const (
-	Arg_R_Full Arg_R = 0
-	Arg_R_Hdrs Arg_R = 1
+	SmArg_R_Full SmArg_R = 0
+	SmArg_R_Hdrs SmArg_R = 1
 )
 
 // -O option=value
@@ -60,7 +52,7 @@ const (
 //             character names only. The short names are not described in
 //             this manual page; see the Sendmail Installation and Operation
 //             Guide for details.
-type Arg_O struct {
+type SmArg_O struct {
 
 	// AliasFile=file
 	//             Use alternate alias file.
@@ -225,94 +217,93 @@ type Arg_O struct {
 	Opt_ConnectionRateThrottle *int16
 }
 
-type Args struct {
-	Arg_main *Arg_main `args:"program"`
+type SmArgs struct {
 
 	// -Btype      Set the body type to type. Current legal values 7BIT or
 	//             8BITMIME.
-	Arg_B *Arg_B `args:"attachedValue"`
+	Arg_B *SmArg_B `args:"attached"`
 
 	// -ba         Go into ARPANET mode. All input lines must end with a CR-LF,
 	//             and all messages will be generated with a CR-LF at the end.
 	//             Also, the ``From:'' and ``Sender:'' fields are examined for
 	//             the name of the sender.
-	Arg_ba bool
+	Arg_ba bool `args:"flag"`
 
 	// -bd         Run as a daemon. This requires Berkeley IPC. Sendmail will
 	//             fork and run in background listening on socket 25 for incom-
 	//             ing SMTP connections. This is normally run from /etc/rc.
-	Arg_bd bool
+	Arg_bd bool `args:"flag"`
 
 	// -bD         Same as -bd except runs in foreground.
-	Arg_bD bool
+	Arg_bD bool `args:"flag"`
 
 	// -bh         Print the persistent host status database.
-	Arg_bh bool
+	Arg_bh bool `args:"flag"`
 
 	// -bH         Purge the persistent host status database.
-	Arg_bH bool
+	Arg_bH bool `args:"flag"`
 
 	// -bi         Initialize the alias database.
-	Arg_bi bool
+	Arg_bi bool `args:"flag"`
 
 	// -bm         Deliver mail in the usual way (default).
-	Arg_bm bool
+	Arg_bm bool `args:"flag"`
 
 	// -bp         Print a listing of the queue.
-	Arg_bp bool
+	Arg_bp bool `args:"flag"`
 
 	// -bs         Use the SMTP protocol as described in RFC821 on standard in-
 	//             put and output. This flag implies all the operations of the
 	//             -ba flag that are compatible with SMTP.
-	Arg_bs bool
+	Arg_bs bool `args:"flag"`
 
 	// -bt         Run in address test mode. This mode reads addresses and
 	//             shows the steps in parsing; it is used for debugging configu-
 	//             ration tables.
-	Arg_bt bool
+	Arg_bt bool `args:"flag"`
 
 	// -bv         Verify names only - do not try to collect or deliver a mes-
 	//             sage. Verify mode is normally used for validating users or
 	//             mailing lists.
-	Arg_bv bool
+	Arg_bv bool `args:"flag"`
 
 	// -Cfile      Use alternate configuration file. Sendmail refuses to run as
 	//             root if an alternate configuration file is specified.
-	Arg_C *string `args:"attachedValue"`
+	Arg_C *string `args:"attached"`
 
 	// -dX         Set debugging value to X.
-	Arg_d *int16 `args:"attachedValue"`
+	Arg_d *int16 `args:"attached"`
 
 	// -Ffullname  Set the full name of the sender.
-	Arg_F *string `args:"attachedValue"`
+	Arg_F *string `args:"attached"`
 
 	// -fname      Sets the name of the ``from'' person (i.e., the sender of the
 	//             mail). -f can only be used by ``trusted'' users (normally
 	//             root, daemon, and network) or if the person you are trying to
 	//             become is the same as the person you are.
-	Arg_f *string `args:"attachedValue"`
+	Arg_f *string `args:"attached"`
 
 	// -hN         Set the hop count to N. The hop count is incremented every
 	//             time the mail is processed. When it reaches a limit, the
 	//             mail is returned with an error message, the victim of an
 	//             aliasing loop. If not specified, ``Received:'' lines in the
 	//             message are counted.
-	Arg_h *int16 `args:"attachedValue"`
+	Arg_h *int16 `args:"attached"`
 
 	// -i          Ignore dots alone on lines by themselves in incoming mes-
 	//             sages. This should be set if you are reading data from a
 	//             file.
-	Arg_i bool
+	Arg_i bool `args:"flag"`
 
 	// -N dsn      Set delivery status notification conditions to dsn, which can
 	//             be `never' for no notifications or a comma separated list of
 	//             the values `failure' to be notified if delivery failed,
 	//             `delay' to be notified if delivery is delayed, and `success'
 	//             to be notified when the message is successfully delivered.
-	Arg_N *Arg_N `args:"trailingValue"`
+	Arg_N *SmArg_N `args:"trailing"`
 
 	// -n          Don't do aliasing.
-	Arg_n bool
+	Arg_n bool `args:"flag"`
 
 	// -O option=value
 	//             Set option option to the specified value. This form uses long
@@ -321,12 +312,12 @@ type Args struct {
 	//             character names only. The short names are not described in
 	//             this manual page; see the Sendmail Installation and Operation
 	//             Guide for details.
-	Arg_O Arg_O `args:"trailingValue"`
+	Arg_O SmArg_O `args:"trailing"`
 
 	// -pprotocol  Set the name of the protocol used to receive the message.
 	//             This can be a simple protocol name such as ``UUCP'' or a pro-
 	//             tocol and hostname, such as ``UUCP:ucbvax''.
-	Arg_p *Arg_p `args:"attachedValue"`
+	Arg_p *SmArg_p `args:"attached"`
 
 	// -q[time]    Processed saved messages in the queue at given intervals. If
 	//             time is omitted, process the queue once. Time is given as a
@@ -335,49 +326,56 @@ type Args struct {
 	//             ple, `-q1h30m' or `-q90m' would both set the timeout to one
 	//             hour thirty minutes. If time is specified, sendmail will run
 	//             in background. This option can be used safely with -bd.
-	Arg_q *time.Duration `args:"attachedValue"`
+	Arg_q *time.Duration `args:"attached"`
 
 	// -qIsubstr   Limit processed jobs to those containing substr as a sub-
 	//             string of the queue id.
-	Arg_qI *string `args:"attachedValue"`
+	Arg_qI *string `args:"attached"`
 
 	// -qRsubstr   Limit processed jobs to those containing substr as a sub-
 	//             string of one of the recipients.
-	Arg_qR *string `args:"attachedValue"`
+	Arg_qR *string `args:"attached"`
 
 	// -qSsubstr   Limit processed jobs to those containing substr as a sub-
 	//             string of the sender.
-	Arg_qS *string `args:"attachedValue"`
+	Arg_qS *string `args:"attached"`
 
 	// -R return   Set the amount of the message to be returned if the message
 	//             bounces. The return parameter can be `full' to return the
 	//             entire message or `hdrs' to return only the headers.
-	Arg_R *Arg_R `args:"trailingValue"`
+	Arg_R *SmArg_R `args:"trailing"`
 
 	// -rname      An alternate and obsolete form of the -f flag.
-	Arg_r *string `args:"attachedValue"`
+	Arg_r *string `args:"attached"`
 
 	// -t          Read message for recipients. To:, Cc:, and Bcc: lines will
 	//             be scanned for recipient addresses. The Bcc: line will be
 	//             deleted before transmission.
-	Arg_t bool
+	Arg_t bool `args:"flag"`
 
 	// -U          Initial (user) submission. This should always be set when
 	//             called from a user agent such as Mail or exmh and never be
 	//             set when called by a network delivery agent such as rmail.
-	Arg_U bool
+	Arg_U bool `args:"flag"`
 
 	// -V envid    Set the original envelope id. This is propagated across SMTP
 	//             to servers that support DSNs and is returned in DSN-compliant
 	//             error messages.
-	Arg_V *string `args:"trailingValue"`
+	Arg_V *string `args:"trailing"`
 
 	// -v          Go into verbose mode. Alias expansions will be announced,
 	//             etc.
-	Arg_v bool
+	Arg_v bool `args:"flag"`
 
 	// -X logfile  Log all traffic in and out of mailers in the indicated log
 	//             file. This should only be used as a last resort for debug-
 	//             ging mailer bugs. It will log a lot of data very quickly.
-	Arg_X *string `args:"trailingValue"`
+	Arg_X *string `args:"trailing"`
+}
+
+type MqArgs struct {
+
+	// -v          Go into verbose mode. Alias expansions will be announced,
+	//             etc.
+	Arg_v bool `args:"flag"`
 }

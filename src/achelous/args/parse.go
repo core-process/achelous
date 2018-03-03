@@ -7,46 +7,52 @@ import (
 	"strings"
 )
 
-type argType int8
+type ArgProgram int8
 
 const (
-	argTypeProgram       = 0
-	argTypeFlag          = 1
-	argTypeAttachedValue = 2
-	argTypeTrailingValue = 3
+	ArgProgramSendmail   ArgProgram = 1
+	ArgProgramNewaliases ArgProgram = 2
+	ArgProgramMailq      ArgProgram = 3
 )
 
-type argConf struct {
-	name  string
-	_type argType
-	value reflect.Value
-}
+func Parse(argv []string) (ArgProgram, *SmArgs, *MqArgs, []string, error) {
 
-func Parse(argv []string) (*Args, error) {
+	// prepare result variables
+	resultProgram := ArgProgramSendmail
+	var resultSmArgs *SmArgs
+	var resultMqArgs *MqArgs
+	var resultValues []string
+
+	// detect program
+	switch filepath.Base(argv[0]) {
+	case "newaliases":
+		resultProgram = ArgProgramNewaliases
+	case "mailq":
+		resultProgram = ArgProgramMailq
+	}
+
 	// generate configuration
-	result := Args{}
+	config := []argConf{}
 
-	argsType := reflect.TypeOf(result)
-	argsValue := reflect.ValueOf(&result).Elem()
+	switch resultProgram {
+	case ArgProgramSendmail:
+		{
 
-	config := make([]argConf, argsValue.NumField())
-
-	for i := 0; i < argsType.NumField(); i++ {
-		field := argsType.Field(i)
-		config[i].value = argsValue.FieldByName(field.Name)
-		config[i].name = "-" + field.Name[len("Arg_"):]
-		switch field.Tag.Get("args") {
-		case "program":
-			config[i]._type = argTypeProgram
-		case "attachedValue":
-			config[i]._type = argTypeAttachedValue
-		case "trailingValue":
-			config[i]._type = argTypeTrailingValue
-		default:
-			config[i]._type = argTypeFlag
+			resultSmArgs = new(SmArgs)
+			config = generateConfig(
+				reflect.TypeOf(*resultSmArgs),
+				reflect.ValueOf(resultSmArgs).Elem())
+		}
+	case ArgProgramMailq:
+		{
+			resultMqArgs = new(MqArgs)
+			config = generateConfig(
+				reflect.TypeOf(*resultMqArgs),
+				reflect.ValueOf(resultMqArgs).Elem())
 		}
 	}
 
+	// parse arguments
 	assignValue := func(ci int, source string) error {
 		err := assign(source, config[ci].value)
 		if err != nil {
@@ -55,67 +61,82 @@ func Parse(argv []string) (*Args, error) {
 		return nil
 	}
 
-	// parse arguments
-	for ai := 0; ai < len(argv); ai++ {
-		// handle arg0
-		if ai == 0 {
+	for ai := 1; ai < len(argv); ai++ {
+		if strings.HasPrefix(argv[ai], "-") {
+			// handle params
+			handled := false
 			for ci := 0; ci < len(config); ci++ {
-				if config[ci]._type == argTypeProgram {
-					source := filepath.Base(argv[ai])
-					err := assignValue(ci, source)
-					if err != nil {
-						return nil, err
+				switch config[ci]._type {
+				case argTypeFlag:
+					if config[ci].name == argv[ai] {
+						source := ""
+						err := assignValue(ci, source)
+						if err != nil {
+							return resultProgram,
+								resultSmArgs,
+								resultMqArgs,
+								resultValues,
+								err
+						}
+						handled = true
+						break
 					}
-					break
+				case argTypeTrailing:
+					if config[ci].name == argv[ai] {
+						if ai+1 >= len(argv) {
+							return resultProgram,
+								resultSmArgs,
+								resultMqArgs,
+								resultValues,
+								errors.New("Value missing for argument " + argv[ai])
+						}
+						source := argv[ai+1]
+						err := assignValue(ci, source)
+						if err != nil {
+							return resultProgram,
+								resultSmArgs,
+								resultMqArgs,
+								resultValues,
+								err
+						}
+						handled = true
+						ai++
+						break
+					}
+				case argTypeAttached:
+					if strings.HasPrefix(argv[ai], config[ci].name) {
+						source := argv[ai][len(config[ci].name):]
+						err := assignValue(ci, source)
+						if err != nil {
+							return resultProgram,
+								resultSmArgs,
+								resultMqArgs,
+								resultValues,
+								err
+						}
+						handled = true
+						break
+					}
 				}
 			}
-			continue
-		}
-		// handle regular args
-		handled := false
-		for ci := 0; ci < len(config); ci++ {
-			switch config[ci]._type {
-			case argTypeFlag:
-				if config[ci].name == argv[ai] {
-					source := ""
-					err := assignValue(ci, source)
-					if err != nil {
-						return nil, err
-					}
-					handled = true
-					break
-				}
-			case argTypeTrailingValue:
-				if config[ci].name == argv[ai] {
-					if ai+1 >= len(argv) {
-						return nil, errors.New("Value missing for argument " + argv[ai])
-					}
-					source := argv[ai+1]
-					err := assignValue(ci, source)
-					if err != nil {
-						return nil, err
-					}
-					handled = true
-					ai++
-					break
-				}
-			case argTypeAttachedValue:
-				if strings.HasPrefix(argv[ai], config[ci].name) {
-					source := argv[ai][len(config[ci].name):]
-					err := assignValue(ci, source)
-					if err != nil {
-						return nil, err
-					}
-					handled = true
-					break
-				}
+			// verify if argument had been processed
+			if !handled {
+				return resultProgram,
+					resultSmArgs,
+					resultMqArgs,
+					resultValues,
+					errors.New("Unknown argument " + argv[ai])
 			}
-		}
-		// verify if argument had been processed
-		if !handled {
-			return nil, errors.New("Unknown argument " + argv[ai])
+		} else {
+			// handle values
+			resultValues = append(resultValues, argv[ai])
 		}
 	}
 
-	return &result, nil
+	// done
+	return resultProgram,
+		resultSmArgs,
+		resultMqArgs,
+		resultValues,
+		nil
 }

@@ -10,10 +10,17 @@ import (
 
 func main() {
 	spew.Dump(os.Args)
-	args, err := args.Parse(os.Args)
+	program, smArgs, mqArgs, values, err := args.Parse(os.Args)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	spew.Dump(*args)
+	spew.Dump(program)
+	if smArgs != nil {
+		spew.Dump(*smArgs)
+	}
+	if mqArgs != nil {
+		spew.Dump(*mqArgs)
+	}
+	spew.Dump(values)
 }

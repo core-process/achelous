@@ -97,27 +97,13 @@ var assignements = map[string]interface{}{
 		return nil
 	},
 
-	"*Arg_main": func(source string, target **Arg_main) error {
-		var value Arg_main
-		switch source {
-		case "newaliases":
-			value = Arg_main_newaliases
-		case "mailq":
-			value = Arg_main_mailq
-		default:
-			value = Arg_main_sendmail
-		}
-		*target = &value
-		return nil
-	},
-
-	"*Arg_B": func(source string, target **Arg_B) error {
-		var value Arg_B
+	"*SmArg_B": func(source string, target **SmArg_B) error {
+		var value SmArg_B
 		switch source {
 		case "7BIT":
-			value = Arg_B_7Bit
+			value = SmArg_B_7Bit
 		case "8BITMIME":
-			value = Arg_B_8BitMime
+			value = SmArg_B_8BitMime
 		default:
 			return errors.New("invalid value (" + source + ")")
 		}
@@ -125,18 +111,18 @@ var assignements = map[string]interface{}{
 		return nil
 	},
 
-	"*Arg_N": func(source string, target **Arg_N) error {
-		value := Arg_N_Never
+	"*SmArg_N": func(source string, target **SmArg_N) error {
+		value := SmArg_N_Never
 		for _, flag := range strings.Split(source, ",") {
 			switch flag {
 			case "never":
 				break // ignore
 			case "failure":
-				value |= Arg_N_Failure
+				value |= SmArg_N_Failure
 			case "delay":
-				value |= Arg_N_Delay
+				value |= SmArg_N_Delay
 			case "success":
-				value |= Arg_N_Success
+				value |= SmArg_N_Success
 			default:
 				return errors.New("invalid value (" + flag + ")")
 			}
@@ -145,8 +131,8 @@ var assignements = map[string]interface{}{
 		return nil
 	},
 
-	"*Arg_p": func(source string, target **Arg_p) error {
-		value := Arg_p{}
+	"*SmArg_p": func(source string, target **SmArg_p) error {
+		value := SmArg_p{}
 		parts := strings.SplitN(source, ":", 2)
 		switch len(parts) {
 		case 2:
@@ -161,13 +147,13 @@ var assignements = map[string]interface{}{
 		return nil
 	},
 
-	"*Arg_R": func(source string, target **Arg_R) error {
-		var value Arg_R
+	"*SmArg_R": func(source string, target **SmArg_R) error {
+		var value SmArg_R
 		switch source {
 		case "full":
-			value = Arg_R_Full
+			value = SmArg_R_Full
 		case "hdrs":
-			value = Arg_R_Hdrs
+			value = SmArg_R_Hdrs
 		default:
 			return errors.New("invalid value (" + source + ")")
 		}
@@ -177,8 +163,8 @@ var assignements = map[string]interface{}{
 }
 
 func init() {
-	assignements["Arg_O"] =
-		func(source string, target *Arg_O) error {
+	assignements["SmArg_O"] =
+		func(source string, target *SmArg_O) error {
 			// extract data
 			parts := strings.SplitN(source, "=", 2)
 			name := parts[0]
