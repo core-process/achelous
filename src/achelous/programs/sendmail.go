@@ -2,7 +2,9 @@ package programs
 
 import (
 	"achelous/args"
+	"bufio"
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/jhillyerd/enmime"
@@ -13,51 +15,63 @@ import (
 // https://github.com/DusanKasan/parsemail
 
 func Sendmail(smArgs *args.SmArgs, recipients []string) {
-	// read mail from stdin
-	//ignoreDots := smArgs.Arg_i || smArgs.Arg_O.Opt_IgnoreDots
-	/*
-		lines := []string{}
-		scanner := bufio.NewScanner(os.Stdin)
-		for scanner.Scan() {
-			line := scanner.Text()
-			if !ignoreDots && line == "." {
-				break
-			}
-			lines = append(lines, line)
-		}
-		if err := scanner.Err(); err != nil {
-			fmt.Fprintln(os.Stderr, "reading standard input:", err)
-			return
-		}
-	*/
+	// prepare standard input
+	var stdin io.Reader
 
-	env, err := enmime.ReadEnvelope(os.Stdin)
+	if smArgs.Arg_i || smArgs.Arg_O.Opt_IgnoreDots {
+		// use stdin directly
+		stdin = os.Stdin
+
+	} else {
+		// filter stdin and stop at single-dot-line
+		pipeReader, pipeWriter := io.Pipe()
+
+		go func() {
+			defer pipeWriter.Close()
+
+			scanner := bufio.NewScanner(os.Stdin)
+			for scanner.Scan() {
+				line := scanner.Text()
+				if line == "." {
+					break
+				}
+				if _, err := io.WriteString(pipeWriter, line+"\n"); err != nil {
+					pipeWriter.CloseWithError(err)
+					break
+				}
+			}
+			if err := scanner.Err(); err != nil {
+				pipeWriter.CloseWithError(err)
+			}
+		}()
+
+		stdin = pipeReader
+	}
+
+	// parse envelope
+	env, err := enmime.ReadEnvelope(stdin)
 	if err != nil {
 		fmt.Print(err)
 		return
 	}
 
-	// Headers can be retrieved via Envelope.GetHeader(name).
 	fmt.Printf("From: %v\n", env.GetHeader("From"))
 
-	// Address-type headers can be parsed into a list of decoded mail.Address structs.
 	alist, _ := env.AddressList("To")
 	for _, addr := range alist {
 		fmt.Printf("To: %s <%s>\n", addr.Name, addr.Address)
 	}
 
-	// enmime can decode quoted-printable headers.
-	fmt.Printf("Subject: %v\n", env.GetHeader("Subject"))
+	fmt.Printf("Root Part Subject: %q\n", env.Root.Header.Get("Subject"))
+	fmt.Printf("Envelope Subject: %q\n", env.GetHeader("Subject"))
+	fmt.Println()
 
-	// The plain text body is available as mime.Text.
-	fmt.Printf("Text Body: %v chars\n", len(env.Text))
+	fmt.Printf("Text Content: %q\n", env.Text)
+	fmt.Printf("HTML Content: %q\n", env.HTML)
+	fmt.Println()
 
-	// The HTML body is stored in mime.HTML.
-	fmt.Printf("HTML Body: %v chars\n", len(env.HTML))
-
-	// mime.Inlines is a slice of inlined attacments.
-	fmt.Printf("Inlines: %v\n", len(env.Inlines))
-
-	// mime.Attachments contains the non-inline attachments.
-	fmt.Printf("Attachments: %v\n", len(env.Attachments))
+	fmt.Println("Envelope errors:")
+	for _, e := range env.Errors {
+		fmt.Println(e.String())
+	}
 }
