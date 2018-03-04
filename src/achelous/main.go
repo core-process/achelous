@@ -4,23 +4,21 @@ import (
 	"achelous/args"
 	"fmt"
 	"os"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
 func main() {
-	spew.Dump(os.Args)
+	// parse arguments
 	program, smArgs, mqArgs, values, err := args.Parse(os.Args)
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	spew.Dump(program)
-	if smArgs != nil {
-		spew.Dump(*smArgs)
+
+	// run sub programs
+	switch program {
+	case args.ArgProgramSendmail:
+		submitEmail(smArgs, values)
+	case args.ArgProgramMailq:
+		listQueue(mqArgs)
 	}
-	if mqArgs != nil {
-		spew.Dump(*mqArgs)
-	}
-	spew.Dump(values)
 }
