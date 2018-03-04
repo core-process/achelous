@@ -16,7 +16,7 @@ type argConf struct {
 	value reflect.Value
 }
 
-func generateConfig(argsType reflect.Type, argsValue reflect.Value) []argConf {
+func prepareConfig(argsType reflect.Type, argsValue reflect.Value) []argConf {
 
 	config := make([]argConf, argsValue.NumField())
 

@@ -10,7 +10,7 @@ import (
 	"unicode/utf8"
 )
 
-var assignements = map[string]interface{}{
+var conversions = map[string]interface{}{
 
 	"*string": func(source string, target **string) error {
 		*target = &source
@@ -163,7 +163,7 @@ var assignements = map[string]interface{}{
 }
 
 func init() {
-	assignements["SmArg_O"] =
+	conversions["SmArg_O"] =
 		func(source string, target *SmArg_O) error {
 			// extract data
 			parts := strings.SplitN(source, "=", 2)
@@ -172,15 +172,15 @@ func init() {
 			if len(parts) > 1 {
 				value = parts[1]
 			}
-			// assign value
+			// convert value
 			field := reflect.
 				ValueOf(target).Elem().
 				FieldByName("Opt_" + name)
-			return assign(value, field)
+			return convert(value, field)
 		}
 }
 
-func assign(source string, target reflect.Value) error {
+func convert(source string, target reflect.Value) error {
 
 	_type := target.Type()
 
@@ -191,7 +191,7 @@ func assign(source string, target reflect.Value) error {
 
 	err, _ :=
 		reflect.
-			ValueOf(assignements[lookup]).
+			ValueOf(conversions[lookup]).
 			Call([]reflect.Value{
 				reflect.ValueOf(source),
 				target.Addr(),

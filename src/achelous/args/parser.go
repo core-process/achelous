@@ -31,7 +31,7 @@ func Parse(argv []string) (ArgProgram, *SmArgs, *MqArgs, []string, error) {
 		resultProgram = ArgProgramMailq
 	}
 
-	// generate configuration
+	// prepare configuration
 	config := []argConf{}
 
 	switch resultProgram {
@@ -39,14 +39,14 @@ func Parse(argv []string) (ArgProgram, *SmArgs, *MqArgs, []string, error) {
 		{
 
 			resultSmArgs = new(SmArgs)
-			config = generateConfig(
+			config = prepareConfig(
 				reflect.TypeOf(*resultSmArgs),
 				reflect.ValueOf(resultSmArgs).Elem())
 		}
 	case ArgProgramMailq:
 		{
 			resultMqArgs = new(MqArgs)
-			config = generateConfig(
+			config = prepareConfig(
 				reflect.TypeOf(*resultMqArgs),
 				reflect.ValueOf(resultMqArgs).Elem())
 		}
@@ -54,7 +54,7 @@ func Parse(argv []string) (ArgProgram, *SmArgs, *MqArgs, []string, error) {
 
 	// parse arguments
 	assignValue := func(ci int, source string) error {
-		err := assign(source, config[ci].value)
+		err := convert(source, config[ci].value)
 		if err != nil {
 			return errors.New("Error while parsing " + config[ci].name + ": " + err.Error())
 		}
