@@ -2,6 +2,7 @@ package main
 
 import (
 	"achelous/args"
+	"achelous/programs"
 	"fmt"
 	"os"
 )
@@ -17,8 +18,8 @@ func main() {
 	// run sub programs
 	switch program {
 	case args.ArgProgramSendmail:
-		submitEmail(smArgs, values)
+		programs.Sendmail(smArgs, values)
 	case args.ArgProgramMailq:
-		listQueue(mqArgs)
+		programs.Mailq(mqArgs)
 	}
 }
