@@ -45,29 +45,31 @@ func Sendmail(smArgs *args.SmArgs, recipients []string) {
 	}
 
 	// parse envelope
-	env, err := enmime.ReadEnvelope(stdin)
+	envelope, err := enmime.ReadEnvelope(stdin)
 	if err != nil {
 		fmt.Print(err)
 		return
 	}
 
-	fmt.Printf("From: %v\n", env.GetHeader("From"))
-
-	alist, _ := env.AddressList("To")
-	for _, addr := range alist {
-		fmt.Printf("To: %s <%s>\n", addr.Name, addr.Address)
+	addresses, _ := envelope.AddressList("From")
+	for _, address := range addresses {
+		fmt.Printf("From: %s <%s>\n", address.Name, address.Address)
 	}
 
-	fmt.Printf("Root Part Subject: %q\n", env.Root.Header.Get("Subject"))
-	fmt.Printf("Envelope Subject: %q\n", env.GetHeader("Subject"))
+	addresses, _ = envelope.AddressList("To")
+	for _, address := range addresses {
+		fmt.Printf("To: %s <%s>\n", address.Name, address.Address)
+	}
+
+	fmt.Printf("Subject: %q\n", envelope.GetHeader("Subject"))
 	fmt.Println()
 
-	fmt.Printf("Text Content: %q\n", env.Text)
-	fmt.Printf("HTML Content: %q\n", env.HTML)
+	fmt.Printf("Text Body: %q\n", envelope.Text)
+	fmt.Printf("HTML Body: %q\n", envelope.HTML)
 	fmt.Println()
 
 	fmt.Println("Envelope errors:")
-	for _, e := range env.Errors {
+	for _, e := range envelope.Errors {
 		fmt.Println(e.String())
 	}
 }
