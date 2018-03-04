@@ -10,10 +10,6 @@ import (
 	"github.com/jhillyerd/enmime"
 )
 
-// https://github.com/jhillyerd/enmime
-// https://github.com/veqryn/go-email
-// https://github.com/DusanKasan/parsemail
-
 func Sendmail(smArgs *args.SmArgs, recipients []string) {
 	// prepare standard input
 	var stdin io.Reader
