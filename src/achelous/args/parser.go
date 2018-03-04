@@ -7,14 +7,6 @@ import (
 	"strings"
 )
 
-type ArgProgram int8
-
-const (
-	ArgProgramSendmail   ArgProgram = 1
-	ArgProgramNewaliases ArgProgram = 2
-	ArgProgramMailq      ArgProgram = 3
-)
-
 func Parse(argv []string) (ArgProgram, *SmArgs, *MqArgs, []string, error) {
 
 	// prepare result variables

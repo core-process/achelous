@@ -2,6 +2,14 @@ package args
 
 import "time"
 
+type ArgProgram int8
+
+const (
+	ArgProgramSendmail   ArgProgram = 1
+	ArgProgramNewaliases ArgProgram = 2
+	ArgProgramMailq      ArgProgram = 3
+)
+
 // See https://www.sendmail.org/~ca/email/man/sendmail.html for more.
 
 // -Btype      Set the body type to type. Current legal values 7BIT or
