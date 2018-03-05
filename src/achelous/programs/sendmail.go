@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 
+	"github.com/google/uuid"
 	"github.com/jhillyerd/enmime"
 )
 
@@ -42,6 +43,13 @@ func Sendmail(smArgs *args.SmArgs, recipients []string) {
 		}()
 
 		stdin = pipeReader
+	}
+
+	// generate a uuid for message
+	id, err := uuid.NewUUID()
+	if id == uuid.Nil || err != nil {
+		fmt.Print(err)
+		return
 	}
 
 	// parse envelope
