@@ -7,6 +7,7 @@ import (
 	"errors"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/jhillyerd/enmime"
 )
@@ -58,6 +59,21 @@ func Sendmail(smArgs *args.SmArgs, recipients []string) error {
 			errMsg += "\n- " + v.String()
 		}
 		return errors.New(errMsg)
+	}
+
+	// enhance From and To
+	if len(envelope.Root.Header.Get("From")) == 0 {
+		if smArgs.Arg_f != nil && smArgs.Arg_F != nil {
+			envelope.Root.Header.Set("From", *smArgs.Arg_F+" <"+*smArgs.Arg_f+">")
+		} else if smArgs.Arg_f != nil {
+			envelope.Root.Header.Set("From", *smArgs.Arg_f)
+		} else if smArgs.Arg_F != nil {
+			envelope.Root.Header.Set("From", *smArgs.Arg_F)
+		}
+	}
+
+	if len(envelope.Root.Header.Get("To")) == 0 && len(recipients) > 0 {
+		envelope.Root.Header.Set("To", strings.Join(recipients, ", "))
 	}
 
 	// add to queue

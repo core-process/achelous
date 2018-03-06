@@ -5,9 +5,8 @@ import "reflect"
 type argType int8
 
 const (
-	argTypeFlag     = 1
-	argTypeAttached = 2
-	argTypeTrailing = 3
+	argTypeFlag  = 1
+	argTypeValue = 2
 )
 
 type argConf struct {
@@ -27,10 +26,8 @@ func prepareConfig(argsType reflect.Type, argsValue reflect.Value) []argConf {
 		switch field.Tag.Get("args") {
 		case "flag":
 			config[i]._type = argTypeFlag
-		case "attached":
-			config[i]._type = argTypeAttached
-		case "trailing":
-			config[i]._type = argTypeTrailing
+		case "value":
+			config[i]._type = argTypeValue
 		default:
 			panic("Invalid arg type " + field.Tag.Get("args") + " at " + field.Name)
 		}

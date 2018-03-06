@@ -229,7 +229,7 @@ type SmArgs struct {
 
 	// -Btype      Set the body type to type. Current legal values 7BIT or
 	//             8BITMIME.
-	Arg_B *SmArg_B `args:"attached"`
+	Arg_B *SmArg_B `args:"value"`
 
 	// -ba         Go into ARPANET mode. All input lines must end with a CR-LF,
 	//             and all messages will be generated with a CR-LF at the end.
@@ -277,26 +277,26 @@ type SmArgs struct {
 
 	// -Cfile      Use alternate configuration file. Sendmail refuses to run as
 	//             root if an alternate configuration file is specified.
-	Arg_C *string `args:"attached"`
+	Arg_C *string `args:"value"`
 
 	// -dX         Set debugging value to X.
-	Arg_d *int16 `args:"attached"`
+	Arg_d *int16 `args:"value"`
 
 	// -Ffullname  Set the full name of the sender.
-	Arg_F *string `args:"attached"`
+	Arg_F *string `args:"value"`
 
 	// -fname      Sets the name of the ``from'' person (i.e., the sender of the
 	//             mail). -f can only be used by ``trusted'' users (normally
 	//             root, daemon, and network) or if the person you are trying to
 	//             become is the same as the person you are.
-	Arg_f *string `args:"attached"`
+	Arg_f *string `args:"value"`
 
 	// -hN         Set the hop count to N. The hop count is incremented every
 	//             time the mail is processed. When it reaches a limit, the
 	//             mail is returned with an error message, the victim of an
 	//             aliasing loop. If not specified, ``Received:'' lines in the
 	//             message are counted.
-	Arg_h *int16 `args:"attached"`
+	Arg_h *int16 `args:"value"`
 
 	// -i          Ignore dots alone on lines by themselves in incoming mes-
 	//             sages. This should be set if you are reading data from a
@@ -308,7 +308,7 @@ type SmArgs struct {
 	//             the values `failure' to be notified if delivery failed,
 	//             `delay' to be notified if delivery is delayed, and `success'
 	//             to be notified when the message is successfully delivered.
-	Arg_N *SmArg_N `args:"trailing"`
+	Arg_N *SmArg_N `args:"value"`
 
 	// -n          Don't do aliasing.
 	Arg_n bool `args:"flag"`
@@ -320,12 +320,12 @@ type SmArgs struct {
 	//             character names only. The short names are not described in
 	//             this manual page; see the Sendmail Installation and Operation
 	//             Guide for details.
-	Arg_O SmArg_O `args:"trailing"`
+	Arg_O SmArg_O `args:"value"`
 
 	// -pprotocol  Set the name of the protocol used to receive the message.
 	//             This can be a simple protocol name such as ``UUCP'' or a pro-
 	//             tocol and hostname, such as ``UUCP:ucbvax''.
-	Arg_p *SmArg_p `args:"attached"`
+	Arg_p *SmArg_p `args:"value"`
 
 	// -q[time]    Processed saved messages in the queue at given intervals. If
 	//             time is omitted, process the queue once. Time is given as a
@@ -334,27 +334,28 @@ type SmArgs struct {
 	//             ple, `-q1h30m' or `-q90m' would both set the timeout to one
 	//             hour thirty minutes. If time is specified, sendmail will run
 	//             in background. This option can be used safely with -bd.
-	Arg_q *time.Duration `args:"attached"`
+	// NOTE: currently we support -q as a flag only!
+	Arg_q bool `args:"flag"`
 
 	// -qIsubstr   Limit processed jobs to those containing substr as a sub-
 	//             string of the queue id.
-	Arg_qI *string `args:"attached"`
+	Arg_qI *string `args:"value"`
 
 	// -qRsubstr   Limit processed jobs to those containing substr as a sub-
 	//             string of one of the recipients.
-	Arg_qR *string `args:"attached"`
+	Arg_qR *string `args:"value"`
 
 	// -qSsubstr   Limit processed jobs to those containing substr as a sub-
 	//             string of the sender.
-	Arg_qS *string `args:"attached"`
+	Arg_qS *string `args:"value"`
 
 	// -R return   Set the amount of the message to be returned if the message
 	//             bounces. The return parameter can be `full' to return the
 	//             entire message or `hdrs' to return only the headers.
-	Arg_R *SmArg_R `args:"trailing"`
+	Arg_R *SmArg_R `args:"value"`
 
 	// -rname      An alternate and obsolete form of the -f flag.
-	Arg_r *string `args:"attached"`
+	Arg_r *string `args:"value"`
 
 	// -t          Read message for recipients. To:, Cc:, and Bcc: lines will
 	//             be scanned for recipient addresses. The Bcc: line will be
@@ -369,7 +370,7 @@ type SmArgs struct {
 	// -V envid    Set the original envelope id. This is propagated across SMTP
 	//             to servers that support DSNs and is returned in DSN-compliant
 	//             error messages.
-	Arg_V *string `args:"trailing"`
+	Arg_V *string `args:"value"`
 
 	// -v          Go into verbose mode. Alias expansions will be announced,
 	//             etc.
@@ -378,7 +379,7 @@ type SmArgs struct {
 	// -X logfile  Log all traffic in and out of mailers in the indicated log
 	//             file. This should only be used as a last resort for debug-
 	//             ging mailer bugs. It will log a lot of data very quickly.
-	Arg_X *string `args:"trailing"`
+	Arg_X *string `args:"value"`
 }
 
 type MqArgs struct {

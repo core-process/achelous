@@ -55,6 +55,14 @@ func Parse(argv []string) (ArgProgram, *SmArgs, *MqArgs, []string, error) {
 
 	for ai := 1; ai < len(argv); ai++ {
 		if strings.HasPrefix(argv[ai], "-") {
+			// make sure params and free values are not mixed
+			if len(resultValues) > 0 {
+				return resultProgram,
+					resultSmArgs,
+					resultMqArgs,
+					resultValues,
+					errors.New("Param following free values (" + argv[ai] + ")")
+			}
 			// handle params
 			handled := false
 			for ci := 0; ci < len(config); ci++ {
@@ -73,31 +81,13 @@ func Parse(argv []string) (ArgProgram, *SmArgs, *MqArgs, []string, error) {
 						handled = true
 						break
 					}
-				case argTypeTrailing:
-					if config[ci].name == argv[ai] {
-						if ai+1 >= len(argv) {
-							return resultProgram,
-								resultSmArgs,
-								resultMqArgs,
-								resultValues,
-								errors.New("Value missing for argument " + argv[ai])
-						}
-						source := argv[ai+1]
-						err := assignValue(ci, source)
-						if err != nil {
-							return resultProgram,
-								resultSmArgs,
-								resultMqArgs,
-								resultValues,
-								err
-						}
-						handled = true
-						ai++
-						break
-					}
-				case argTypeAttached:
+				case argTypeValue:
 					if strings.HasPrefix(argv[ai], config[ci].name) {
 						source := argv[ai][len(config[ci].name):]
+						if len(source) == 0 && ai+1 < len(argv) && !strings.HasPrefix(argv[ai+1], "-") {
+							source = argv[ai+1]
+							ai++
+						}
 						err := assignValue(ci, source)
 						if err != nil {
 							return resultProgram,
