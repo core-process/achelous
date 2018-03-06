@@ -25,3 +25,6 @@
 [submodule "src/github.com/google/uuid"]
 	path = src/github.com/google/uuid
 	url = https://github.com/google/uuid.git
+[submodule "src/github.com/oklog/ulid"]
+	path = src/github.com/oklog/ulid
+	url = https://github.com/oklog/ulid.git

@@ -4,7 +4,7 @@ import (
 	"os/user"
 	"path"
 
-	"github.com/google/uuid"
+	"github.com/oklog/ulid"
 )
 
 func QueuePath(queue QueueRef) string {
@@ -15,6 +15,6 @@ func QueuePath(queue QueueRef) string {
 	return path.Join(user.HomeDir, ".achelous/queues", string(queue))
 }
 
-func MessagePath(queue QueueRef, msgId uuid.UUID, status MessageStatus) string {
+func MessagePath(queue QueueRef, msgId ulid.ULID, status MessageStatus) string {
 	return path.Join(QueuePath(queue), msgId.String()+"."+string(status))
 }

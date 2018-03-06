@@ -1,12 +1,13 @@
 package queue
 
 import (
+	"crypto/rand"
 	"encoding/json"
 	"os"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/jhillyerd/enmime"
+	"github.com/oklog/ulid"
 )
 
 func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
@@ -105,8 +106,8 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 		)
 	}
 
-	// generate a uuid for message
-	id, err := uuid.NewUUID()
+	// generate a ulid for message
+	id, err := ulid.New(ulid.Now(), rand.Reader)
 	if err != nil {
 		return err
 	}
