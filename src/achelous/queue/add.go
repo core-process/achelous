@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"os"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/jhillyerd/enmime"
@@ -17,7 +18,7 @@ func AddToQueue(envelope *enmime.Envelope) error {
 		return err
 	}
 
-	// create directory
+	// create message directory
 	err = os.MkdirAll(
 		MsgBasePath(MessageStatusPreparing, newID),
 		os.ModePerm,
@@ -28,6 +29,9 @@ func AddToQueue(envelope *enmime.Envelope) error {
 
 	// prepare message meta data
 	var msgMeta MessageMeta
+
+	msgMeta.Timestamp = time.Now()
+	msgMeta.Subject = envelope.GetHeader("Subject")
 
 	addresses, err := envelope.AddressList("From")
 	if err != nil {
@@ -56,8 +60,6 @@ func AddToQueue(envelope *enmime.Envelope) error {
 			},
 		)
 	}
-
-	msgMeta.Subject = envelope.GetHeader("Subject")
 
 	// write message meta data
 	msgMetaJSON, err := json.Marshal(msgMeta)
@@ -141,6 +143,15 @@ func AddToQueue(envelope *enmime.Envelope) error {
 		if err != nil {
 			return err
 		}
+	}
+
+	// create directory for queued messages
+	err = os.MkdirAll(
+		BasePath(MessageStatusQueued),
+		os.ModePerm,
+	)
+	if err != nil {
+		return err
 	}
 
 	// change message state to queued
