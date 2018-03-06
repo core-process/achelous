@@ -2,7 +2,6 @@ package queue
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"time"
 
@@ -74,6 +73,7 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 		return err
 	}
 
+	msg.Participants.To = []Participant{}
 	for _, address := range addresses {
 		msg.Participants.To = append(
 			msg.Participants.To,
@@ -91,6 +91,7 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 	msg.Body.HTML = envelope.HTML
 
 	// add attachment data
+	msg.Attachments = []Attachment{}
 	for _, attachment := range envelope.Attachments {
 		msg.Attachments = append(
 			msg.Attachments,
@@ -111,17 +112,25 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 	}
 
 	// write message data
-	msgJSON, err := json.Marshal(msg)
+	file, err := os.Create(MessagePath(queue, newID, MessageStatusPreparing))
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 
-	err = ioutil.WriteFile(
-		MessagePath(queue, newID, MessageStatusPreparing),
-		msgJSON,
-		0644,
-	)
-	if err != nil {
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	encoder.SetEscapeHTML(false)
+
+	if err = encoder.Encode(msg); err != nil {
+		return err
+	}
+
+	if err = file.Sync(); err != nil {
+		return err
+	}
+
+	if err = file.Close(); err != nil {
 		return err
 	}
 
