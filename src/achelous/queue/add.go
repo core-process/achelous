@@ -3,6 +3,7 @@ package queue
 import (
 	"crypto/rand"
 	"encoding/json"
+	"net/mail"
 	"os"
 	"time"
 
@@ -23,6 +24,8 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 
 	// prepare message header
 	var msg Message
+	msg.Participants.To = []Participant{}
+	msg.Attachments = []Attachment{}
 
 	dateStr := envelope.GetHeader("Date")
 	if len(dateStr) > 0 {
@@ -57,32 +60,35 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 	}
 
 	addresses, err := envelope.AddressList("From")
-	if err != nil {
-		return err
-	}
-
-	for _, address := range addresses {
-		msg.Participants.From = &Participant{
-			Name:  address.Name,
-			Email: address.Address,
+	if err != mail.ErrHeaderNotPresent {
+		if err != nil {
+			return err
 		}
-		break
+
+		for _, address := range addresses {
+			msg.Participants.From = &Participant{
+				Name:  address.Name,
+				Email: address.Address,
+			}
+			break
+		}
 	}
 
 	addresses, err = envelope.AddressList("To")
-	if err != nil {
-		return err
-	}
+	if err != mail.ErrHeaderNotPresent {
+		if err != nil {
+			return err
+		}
 
-	msg.Participants.To = []Participant{}
-	for _, address := range addresses {
-		msg.Participants.To = append(
-			msg.Participants.To,
-			Participant{
-				Name:  address.Name,
-				Email: address.Address,
-			},
-		)
+		for _, address := range addresses {
+			msg.Participants.To = append(
+				msg.Participants.To,
+				Participant{
+					Name:  address.Name,
+					Email: address.Address,
+				},
+			)
+		}
 	}
 
 	msg.Subject = envelope.GetHeader("Subject")
@@ -92,7 +98,6 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 	msg.Body.HTML = envelope.HTML
 
 	// add attachment data
-	msg.Attachments = []Attachment{}
 	for _, attachment := range envelope.Attachments {
 		msg.Attachments = append(
 			msg.Attachments,
