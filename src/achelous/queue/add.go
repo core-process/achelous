@@ -106,13 +106,15 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 	}
 
 	// generate a uuid for message
-	newID, err := uuid.NewUUID()
+	id, err := uuid.NewUUID()
 	if err != nil {
 		return err
 	}
 
 	// write message data
-	file, err := os.Create(MessagePath(queue, newID, MessageStatusPreparing))
+	pathPreparing := MessagePath(queue, id, MessageStatusPreparing)
+
+	file, err := os.Create(pathPreparing)
 	if err != nil {
 		return err
 	}
@@ -135,9 +137,11 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 	}
 
 	// change message state to queued
+	pathQueued := MessagePath(queue, id, MessageStatusQueued)
+
 	err = os.Rename(
-		MessagePath(queue, newID, MessageStatusPreparing),
-		MessagePath(queue, newID, MessageStatusQueued),
+		pathPreparing,
+		pathQueued,
 	)
 	if err != nil {
 		return err
