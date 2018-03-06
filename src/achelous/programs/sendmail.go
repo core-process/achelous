@@ -13,41 +13,60 @@ import (
 )
 
 func Sendmail(smArgs *args.SmArgs, recipients []string) error {
-	// prepare standard input
-	var stdin io.Reader
 
-	if smArgs.Arg_i || smArgs.Arg_O.Opt_IgnoreDots {
-		// use stdin directly
-		stdin = os.Stdin
+	// filter stdin and stop at single-dot-line
+	ignoreDot := smArgs.Arg_i || smArgs.Arg_O.Opt_IgnoreDots
 
-	} else {
-		// filter stdin and stop at single-dot-line
-		pipeReader, pipeWriter := io.Pipe()
+	filterReader, filterWriter := io.Pipe()
 
-		go func() {
-			defer pipeWriter.Close()
+	go func() {
+		// close writer at end of func
+		defer filterWriter.Close()
 
-			scanner := bufio.NewScanner(os.Stdin)
-			for scanner.Scan() {
-				line := scanner.Text()
-				if line == "." {
-					break
-				}
-				if _, err := io.WriteString(pipeWriter, line+"\n"); err != nil {
-					pipeWriter.CloseWithError(err)
-					break
+		// scan lines, perform modifications
+		scanner := bufio.NewScanner(os.Stdin)
+		headerSection := true
+		currentLine := -1
+
+		for scanner.Scan() {
+			// get next line
+			line := scanner.Text()
+			currentLine++
+			// handle "."
+			if !ignoreDot && line == "." {
+				break
+			}
+			// handle end of header
+			if headerSection {
+				if len(line) == 0 {
+					// we leave the header section naturally
+					headerSection = false
+				} else {
+					// we have to simulate the end of the header section
+					isHeaderLine := strings.Index(line, ":") > 0
+					isContLine := strings.IndexAny(line, " \t") == 0 && currentLine > 0
+
+					if !isHeaderLine && !isContLine {
+						line = "\n" + line
+						headerSection = false
+					}
 				}
 			}
-			if err := scanner.Err(); err != nil {
-				pipeWriter.CloseWithError(err)
+			// forward data (and errors)
+			line += "\n"
+			if _, err := io.WriteString(filterWriter, line); err != nil {
+				filterWriter.CloseWithError(err)
+				break
 			}
-		}()
-
-		stdin = pipeReader
-	}
+		}
+		// forward errors
+		if err := scanner.Err(); err != nil {
+			filterWriter.CloseWithError(err)
+		}
+	}()
 
 	// parse envelope
-	envelope, err := enmime.ReadEnvelope(stdin)
+	envelope, err := enmime.ReadEnvelope(filterReader)
 	if err != nil {
 		return err
 	}
