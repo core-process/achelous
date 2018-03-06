@@ -1,8 +1,8 @@
 package main
 
 import (
-	"achelous/args"
-	"achelous/programs"
+	"achelous/spring/args"
+	"achelous/spring/programs"
 	"fmt"
 	"os"
 )

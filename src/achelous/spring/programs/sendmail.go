@@ -1,8 +1,8 @@
 package programs
 
 import (
-	"achelous/args"
-	"achelous/queue"
+	"achelous/common/queue"
+	"achelous/spring/args"
 	"bufio"
 	"errors"
 	"io"

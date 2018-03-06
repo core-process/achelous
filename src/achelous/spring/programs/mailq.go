@@ -1,6 +1,6 @@
 package programs
 
-import "achelous/args"
+import "achelous/spring/args"
 
 func Mailq(mqArgs *args.MqArgs) error {
 	return nil
