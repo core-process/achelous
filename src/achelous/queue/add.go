@@ -30,7 +30,38 @@ func AddToQueue(envelope *enmime.Envelope) error {
 	// prepare message meta data
 	var msgMeta MessageMeta
 
-	msgMeta.Timestamp = time.Now()
+	dateStr := envelope.GetHeader("Date")
+	if len(dateStr) > 0 {
+		formats := []string{
+			"Mon, _2 Jan 2006 15:04:05 MST",
+			"Mon, _2 Jan 2006 15:04:05 -0700",
+			time.RFC1123,
+			time.RFC1123Z,
+			time.ANSIC,
+			time.UnixDate,
+			time.RubyDate,
+			time.RFC822,
+			time.RFC822Z,
+			time.RFC850,
+			time.RFC3339,
+			time.RFC3339Nano,
+		}
+		var timestamp time.Time
+		var err error
+		for _, format := range formats {
+			timestamp, err = time.Parse(format, dateStr)
+			if err == nil {
+				break
+			}
+		}
+		if err != nil {
+			return err
+		}
+		msgMeta.Timestamp = timestamp
+	} else {
+		msgMeta.Timestamp = time.Now()
+	}
+
 	msgMeta.Subject = envelope.GetHeader("Subject")
 
 	addresses, err := envelope.AddressList("From")
