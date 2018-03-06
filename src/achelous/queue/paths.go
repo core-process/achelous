@@ -8,39 +8,48 @@ import (
 	"github.com/google/uuid"
 )
 
-func BasePath() string {
+func BasePath(status MessageStatus) string {
 	user, err := user.Current()
 	if err != nil {
 		panic(err)
 	}
-	return path.Join(user.HomeDir, ".achelous/queue/")
+	var subDir string
+	switch status {
+	case MessageStatusPreparing:
+		subDir = "preparing"
+	case MessageStatusQueued:
+		subDir = "queued"
+	default:
+		panic("Invalid message status")
+	}
+	return path.Join(user.HomeDir, ".achelous", subDir)
 }
 
-func MsgBasePath(msgId uuid.UUID) string {
-	return path.Join(BasePath(), msgId.String())
+func MsgBasePath(status MessageStatus, msgId uuid.UUID) string {
+	return path.Join(BasePath(status), msgId.String())
 }
 
-func MsgMetaPath(msgId uuid.UUID) string {
-	return path.Join(MsgBasePath(msgId), "meta.json")
+func MsgMetaPath(status MessageStatus, msgId uuid.UUID) string {
+	return path.Join(MsgBasePath(status, msgId), "meta.json")
 }
 
-func MsgTextBodyPath(msgId uuid.UUID) string {
-	return path.Join(MsgBasePath(msgId), "body.txt")
+func MsgTextBodyPath(status MessageStatus, msgId uuid.UUID) string {
+	return path.Join(MsgBasePath(status, msgId), "body.txt")
 }
 
-func MsgHtmlBodyPath(msgId uuid.UUID) string {
-	return path.Join(MsgBasePath(msgId), "body.html")
+func MsgHtmlBodyPath(status MessageStatus, msgId uuid.UUID) string {
+	return path.Join(MsgBasePath(status, msgId), "body.html")
 }
 
-func AttBasePath(msgId uuid.UUID, attId string) string {
+func AttBasePath(status MessageStatus, msgId uuid.UUID, attId string) string {
 	attId = base64.StdEncoding.EncodeToString([]byte(attId))
-	return path.Join(MsgBasePath(msgId), attId)
+	return path.Join(MsgBasePath(status, msgId), attId)
 }
 
-func AttMetaPath(msgId uuid.UUID, attId string) string {
-	return path.Join(AttBasePath(msgId, attId), "meta")
+func AttMetaPath(status MessageStatus, msgId uuid.UUID, attId string) string {
+	return path.Join(AttBasePath(status, msgId, attId), "meta")
 }
 
-func AttBodyPath(msgId uuid.UUID, attId string) string {
-	return path.Join(AttBasePath(msgId, attId), "body")
+func AttBodyPath(status MessageStatus, msgId uuid.UUID, attId string) string {
+	return path.Join(AttBasePath(status, msgId, attId), "body")
 }

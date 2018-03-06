@@ -2,16 +2,16 @@ package programs
 
 import (
 	"achelous/args"
+	"achelous/queue"
 	"bufio"
-	"fmt"
+	"errors"
 	"io"
 	"os"
 
-	"github.com/google/uuid"
 	"github.com/jhillyerd/enmime"
 )
 
-func Sendmail(smArgs *args.SmArgs, recipients []string) {
+func Sendmail(smArgs *args.SmArgs, recipients []string) error {
 	// prepare standard input
 	var stdin io.Reader
 
@@ -45,39 +45,26 @@ func Sendmail(smArgs *args.SmArgs, recipients []string) {
 		stdin = pipeReader
 	}
 
-	// generate a uuid for message
-	id, err := uuid.NewUUID()
-	if id == uuid.Nil || err != nil {
-		fmt.Print(err)
-		return
-	}
-
 	// parse envelope
 	envelope, err := enmime.ReadEnvelope(stdin)
 	if err != nil {
-		fmt.Print(err)
-		return
+		return err
 	}
 
-	addresses, _ := envelope.AddressList("From")
-	for _, address := range addresses {
-		fmt.Printf("From: %s <%s>\n", address.Name, address.Address)
+	// check for errors
+	if len(envelope.Errors) > 0 {
+		errMsg := "Parsing failed:"
+		for _, v := range envelope.Errors {
+			errMsg += "\n- " + v.String()
+		}
+		return errors.New(errMsg)
 	}
 
-	addresses, _ = envelope.AddressList("To")
-	for _, address := range addresses {
-		fmt.Printf("To: %s <%s>\n", address.Name, address.Address)
+	// add to queue
+	err = queue.AddToQueue(envelope)
+	if err != nil {
+		return err
 	}
 
-	fmt.Printf("Subject: %q\n", envelope.GetHeader("Subject"))
-	fmt.Println()
-
-	fmt.Printf("Text Body: %q\n", envelope.Text)
-	fmt.Printf("HTML Body: %q\n", envelope.HTML)
-	fmt.Println()
-
-	fmt.Println("Envelope errors:")
-	for _, e := range envelope.Errors {
-		fmt.Println(e.String())
-	}
+	return nil
 }

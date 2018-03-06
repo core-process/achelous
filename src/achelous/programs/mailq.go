@@ -2,5 +2,6 @@ package programs
 
 import "achelous/args"
 
-func Mailq(mqArgs *args.MqArgs) {
+func Mailq(mqArgs *args.MqArgs) error {
+	return nil
 }

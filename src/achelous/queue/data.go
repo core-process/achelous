@@ -2,6 +2,13 @@ package queue
 
 import "time"
 
+type MessageStatus int8
+
+const (
+	MessageStatusPreparing MessageStatus = 0
+	MessageStatusQueued    MessageStatus = 1
+)
+
 type Participant struct {
 	Name  string `json:"name"`
 	Email string `json:"email"`
@@ -9,7 +16,7 @@ type Participant struct {
 
 type MessageMeta struct {
 	Participants struct {
-		From Participant   `json:"from"`
+		From *Participant  `json:"from"`
 		To   []Participant `json:"to"`
 	} `json:"participants"`
 	Subject   string    `json:"subject"`
