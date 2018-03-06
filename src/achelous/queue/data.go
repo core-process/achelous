@@ -2,11 +2,17 @@ package queue
 
 import "time"
 
-type MessageStatus int8
+type QueueRef string
 
 const (
-	MessageStatusPreparing MessageStatus = 0
-	MessageStatusQueued    MessageStatus = 1
+	QueueRefRoot QueueRef = ""
+)
+
+type MessageStatus string
+
+const (
+	MessageStatusPreparing MessageStatus = "preparing"
+	MessageStatusQueued    MessageStatus = "queued"
 )
 
 type Participant struct {
@@ -14,18 +20,24 @@ type Participant struct {
 	Email string `json:"email"`
 }
 
-type MessageMeta struct {
-	Participants struct {
-		From *Participant  `json:"from"`
-		To   []Participant `json:"to"`
-	} `json:"participants"`
-	Subject   string    `json:"subject"`
-	Timestamp time.Time `json:"timestamp"`
-}
-
-type AttachmentMeta struct {
+type Attachment struct {
 	Id      string `json:"id"`
 	Type    string `json:"type"`
 	Charset string `json:"charset"`
 	Name    string `json:"name"`
+	Content []byte `json:"content"`
+}
+
+type Message struct {
+	Timestamp    time.Time `json:"timestamp"`
+	Participants struct {
+		From *Participant  `json:"from"`
+		To   []Participant `json:"to"`
+	} `json:"participants"`
+	Subject string `json:"subject"`
+	Body    struct {
+		Text string `json:"text"`
+		HTML string `json:"html"`
+	} `json:"body"`
+	Attachments []Attachment `json:"attachments"`
 }
