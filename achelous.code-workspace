@@ -18,9 +18,6 @@
 		},
 		// Set path to required Go tools
 		// Add ~/.gotools/bin to your PATH and restart Visual Studio Code
-		"go.toolsGopath": "~/.gotools",
-		"files.associations": {
-			"unistd.h": "c"
-		}
+		"go.toolsGopath": "~/.gotools"
 	}
 }

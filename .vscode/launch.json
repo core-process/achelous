@@ -5,13 +5,25 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "achelous",
+            "name": "spring-core",
             "type": "go",
             "request": "launch",
-            "mode": "debug",
+            "mode": "exec",
             "port": 2345,
             "host": "127.0.0.1",
-            "program": "${workspaceFolder}/src/achelous",
+            "program": "${workspaceFolder}/bin/spring-core",
+            "env": {},
+            "args": [],
+            "showLog": true
+        },
+        {
+            "name": "upstream-core",
+            "type": "go",
+            "request": "launch",
+            "mode": "exec",
+            "port": 2345,
+            "host": "127.0.0.1",
+            "program": "${workspaceFolder}/bin/upstream-core",
             "env": {},
             "args": [],
             "showLog": true
