@@ -7,6 +7,10 @@ SOURCES    = $(BUILDSPACE)/src/$(PACKAGE)
 BINARIES   = $(BUILDSPACE)/bin
 PACKSPACE  = .pack
 
+# source files
+GO_FILES = $(shell find $(SOURCES)/ -type f -name '*.go')
+C_FILES  = $(shell find $(SOURCES)/ -type f -name '*.c')
+
 # build tools
 GO        = go
 GLIDE     = glide
@@ -23,16 +27,16 @@ all: build
 build: $(BINARIES)/spring-core $(BINARIES)/spring
 build: $(BINARIES)/upstream-core $(BINARIES)/upstream
 
-$(BINARIES)/spring-core: $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
+$(BINARIES)/spring-core: $(GO_FILES) $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ spring-core/main.go
 
-$(BINARIES)/upstream-core: $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
+$(BINARIES)/upstream-core: $(GO_FILES) $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ upstream-core/main.go
 
-$(BINARIES)/spring: $(SOURCES)/bootstrap/main.c | $(SOURCES) $(BINARIES)
+$(BINARIES)/spring: $(C_FILES) $(SOURCES)/bootstrap/main.c | $(SOURCES) $(BINARIES)
 	gcc $(SOURCES)/bootstrap/main.c -o $@
 
-$(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c | $(SOURCES) $(BINARIES)
+$(BINARIES)/upstream: $(C_FILES) $(SOURCES)/bootstrap/main.c | $(SOURCES) $(BINARIES)
 	gcc $(SOURCES)/bootstrap/main.c -o $@
 
 $(SOURCES)/glide.lock: $(SOURCES)/glide.yaml | $(SOURCES)
