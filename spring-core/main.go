@@ -1,10 +1,11 @@
 package main
 
 import (
-	"achelous/spring-core/args"
-	"achelous/spring-core/programs"
 	"fmt"
 	"os"
+
+	"github.com/core-process/achelous/spring-core/args"
+	"github.com/core-process/achelous/spring-core/programs"
 )
 
 func main() {

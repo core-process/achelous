@@ -1,13 +1,14 @@
 package programs
 
 import (
-	"achelous/common/queue"
-	"achelous/spring-core/args"
 	"bufio"
 	"errors"
 	"io"
 	"os"
 	"strings"
+
+	"github.com/core-process/achelous/common/queue"
+	"github.com/core-process/achelous/spring-core/args"
 
 	"github.com/jhillyerd/enmime"
 )
