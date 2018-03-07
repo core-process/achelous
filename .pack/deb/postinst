@@ -1,0 +1,34 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    configure)
+        # create a achelous group and user
+        if ! getent passwd achelous >/dev/null 2>&1; then
+            adduser --system --no-create-home --uid 899 achelous
+            addgroup --system --gid 899 achelous
+            adduser achelous achelous
+        fi
+
+        # create spool dir
+        if [ ! -d /var/spool/achelous ]; then
+            mkdir -p /var/spool/achelous
+            chown achelous:achelous /var/spool/achelous
+        fi
+
+        # create log dir
+        if [ ! -d /var/log/achelous ]; then
+            mkdir -p /var/log/achelous
+            chown achelous:achelous /var/log/achelous
+        fi
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+    ;;
+esac

@@ -30,10 +30,10 @@ $(BINARIES)/upstream-core: $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ upstream-core/main.go
 
 $(BINARIES)/spring: | $(SOURCES) $(BINARIES)
-	gcc $(SOURCES)/wrapper/main.c -o $@
+	gcc $(SOURCES)/bootstrap/main.c -o $@
 
 $(BINARIES)/upstream: | $(SOURCES) $(BINARIES)
-	gcc $(SOURCES)/wrapper/main.c -o $@
+	gcc $(SOURCES)/bootstrap/main.c -o $@
 
 $(SOURCES)/glide.lock: $(SOURCES)/glide.yaml | $(SOURCES)
 	cd $(SOURCES) && $(GLIDE) update
@@ -58,6 +58,7 @@ pack: pack_deb
 pack_deb: pack_assemble
 	mkdir -p $(PACKSPACE)/.build/root/DEBIAN
 	envsubst < $(PACKSPACE)/deb/control > $(PACKSPACE)/.build/root/DEBIAN/control
+	cp $(PACKSPACE)/deb/postinst $(PACKSPACE)/.build/root/DEBIAN/postinst
 	cd $(PACKSPACE)/.build && dpkg-deb --build root achelous_$(VERSION)_$(ARCHITECTURE).deb
 
 pack_assemble: build
