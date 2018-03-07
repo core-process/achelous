@@ -1,0 +1,10 @@
+Package: achelous
+Version: ${VERSION}
+Section: base
+Priority: optional
+Architecture: ${ARCHITECTURE}
+Maintainer: Niklas Salmoukas <niklas@salmoukas.com>
+Description: Achelous is a sendmail replacement, which
+ queues and uploads emails to a webservice. It is designed
+ for IoT devices and containers, which might send emails
+ for administrative purposes.
