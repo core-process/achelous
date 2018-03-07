@@ -7,8 +7,8 @@
 #include <errno.h>
 #include <linux/limits.h>
 
-#define ACHELOUS_USER "niklas"
-#define ACHELOUS_GROUP "niklas"
+#define ACHELOUS_USER "achelous"
+#define ACHELOUS_GROUP "achelous"
 
 int switch_user()
 {

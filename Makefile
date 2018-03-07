@@ -29,10 +29,10 @@ $(BINARIES)/spring-core: $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
 $(BINARIES)/upstream-core: $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ upstream-core/main.go
 
-$(BINARIES)/spring: | $(SOURCES) $(BINARIES)
+$(BINARIES)/spring: $(SOURCES)/bootstrap/main.c | $(SOURCES) $(BINARIES)
 	gcc $(SOURCES)/bootstrap/main.c -o $@
 
-$(BINARIES)/upstream: | $(SOURCES) $(BINARIES)
+$(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c | $(SOURCES) $(BINARIES)
 	gcc $(SOURCES)/bootstrap/main.c -o $@
 
 $(SOURCES)/glide.lock: $(SOURCES)/glide.yaml | $(SOURCES)
