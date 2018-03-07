@@ -11,7 +11,7 @@
             "mode": "exec",
             "port": 2345,
             "host": "127.0.0.1",
-            "program": "${workspaceFolder}/.gopath/bin/spring-core",
+            "program": "${workspaceFolder}/.build/bin/spring-core",
             "env": {},
             "args": [],
             "showLog": true
@@ -23,7 +23,7 @@
             "mode": "exec",
             "port": 2345,
             "host": "127.0.0.1",
-            "program": "${workspaceFolder}/.gopath/bin/upstream-core",
+            "program": "${workspaceFolder}/.build/bin/upstream-core",
             "env": {},
             "args": [],
             "showLog": true
