@@ -1,9 +1,9 @@
 PACKAGE   = github.com/core-process/achelous
 
-WORKSPACE = $(realpath $(dir $(realpath $(firstword $(MAKEFILE_LIST)))))
-GOPATH    = $(WORKSPACE)/.gopath
-SOURCES   = $(GOPATH)/src/$(PACKAGE)
-BINARIES  = $(GOPATH)/bin
+BUILDSPACE = .build
+GOPATH     = $(CURDIR)/$(BUILDSPACE)
+SOURCES    = $(BUILDSPACE)/src/$(PACKAGE)
+BINARIES   = $(BUILDSPACE)/bin
 
 GO        = go
 GLIDE     = glide
@@ -30,10 +30,10 @@ $(SOURCES)/vendor: $(SOURCES)/glide.lock | $(SOURCES)
 
 $(SOURCES):
 	mkdir -p $(dir $@)
-	ln -sf $(WORKSPACE) $@
+	ln -sf $(CURDIR) $@
 
 $(BINARIES):
 	mkdir -p $@
 
 clean:
-	rm -rf $(GOPATH)
+	rm -rf $(BUILDSPACE)

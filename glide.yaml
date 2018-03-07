@@ -1,4 +1,4 @@
-package: achelous
+package: github.com/core-process/achelous
 import:
 - package: github.com/jhillyerd/enmime
   version: ^0.2.0
