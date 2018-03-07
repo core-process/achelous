@@ -1,0 +1,40 @@
+hash: bb1c1d51ab2037d5b4393dd101486667df35e99f6c3258f1ae974dc3228a3806
+updated: 2018-03-07T19:04:07.731225827+01:00
+imports:
+- name: github.com/jaytaylor/html2text
+  version: 190166da35878a77103b951ae035a473531c1fc2
+- name: github.com/jhillyerd/enmime
+  version: bed8d3f5e62dd8aca071dfe08f775f17e3647dd7
+  subpackages:
+  - internal/coding
+  - internal/stringutil
+- name: github.com/mattn/go-runewidth
+  version: a9d6d1e4dc51df2130326793d49971f238839169
+- name: github.com/oklog/ulid
+  version: d311cb43c92434ec4072dfbbda3400741d0a6337
+- name: github.com/olekukonko/tablewriter
+  version: b8a9be070da40449e501c3c4730a889e42d87a9e
+- name: github.com/ssor/bom
+  version: 6386211fdfcf24c0bfbdaceafd02849ed9a8a509
+- name: golang.org/x/net
+  version: d25186b37f34ebdbbea8f488ef055638dfab272d
+  subpackages:
+  - html
+  - html/atom
+- name: golang.org/x/text
+  version: b7ef84aaf62aa3e70962625c80a571ae7c17cb40
+  subpackages:
+  - encoding
+  - encoding/charmap
+  - encoding/internal
+  - encoding/internal/identifier
+  - encoding/japanese
+  - encoding/korean
+  - encoding/simplifiedchinese
+  - encoding/traditionalchinese
+  - encoding/unicode
+  - internal/utf8internal
+  - runes
+  - transform
+  - unicode/norm
+testImports: []

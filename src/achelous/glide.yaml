@@ -1,0 +1,6 @@
+package: achelous
+import:
+- package: github.com/jhillyerd/enmime
+  version: ^0.2.0
+- package: github.com/oklog/ulid
+  version: ^0.3.0

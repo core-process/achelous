@@ -1,9 +1,11 @@
 #!/bin/bash
 set -e
 
-# prepare variables
-WORKSPACE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# switch to workspace
+cd "$(dirname "${BASH_SOURCE[0]}")"
+WORKSPACE="$(pwd)"
 
+# detect target command
 if [ "$#" -ne 0 ];
 then
     TARGET=("$@")
@@ -11,7 +13,8 @@ else
     TARGET=("$(getent passwd "$USER" | awk -F: '{print $NF}')")
 fi
 
-# prepare environment and run command
+# show commands
 set -x
-cd "$WORKSPACE"
+
+# run target command
 GOPATH="$WORKSPACE" exec ${TARGET[@]}

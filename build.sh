@@ -1,15 +1,21 @@
 #!/bin/bash
 set -e
 
-# prepare variables
-WORKSPACE="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# switch to workspace
+cd "$(dirname "${BASH_SOURCE[0]}")"
+WORKSPACE="$(pwd)"
+
+# show commands
+set -x
+
+# install go dependencies
+pushd src/achelous
+GOPATH="$WORKSPACE" glide install
+popd
 
 # build go sources
-echo "Building Go sources..."
-"$WORKSPACE/env.sh" go install achelous/spring-core achelous/upstream-core
+GOPATH="$WORKSPACE" go install achelous/spring-core achelous/upstream-core
 
 # build c sources
-echo "Building C sources..."
-cd "$WORKSPACE" && mkdir -p bin && gcc src/achelous/wrapper.c -o bin/spring && cp bin/spring bin/upstream
-
-echo "Done!"
+gcc src/achelous/wrapper/main.c -o bin/spring
+cp bin/spring bin/upstream
