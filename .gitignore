@@ -1,4 +1,4 @@
-/.build
+/.build/bin
 /.pack/.build
 /bootstrap/config.h
 /common/config/config.go

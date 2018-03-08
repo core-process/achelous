@@ -97,7 +97,7 @@ $(PACKSPACE)/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb: $(BINARY_FILES) $(P
 
 # cleanup target
 clean:
-	rm -rf $(BUILDSPACE)
+	rm -rf $(BUILDSPACE)/bin
 	rm -rf $(PACKSPACE)/.build
 	rm -f bootstrap/config.h
 	rm -f common/config/config.go
