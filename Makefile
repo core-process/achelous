@@ -40,7 +40,7 @@ build: $(BINARY_FILES)
 $(BINARIES)/spring-core $(BINARIES)/upstream-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ $(notdir $@)/main.go
 
-$(SOURCES)/common/config/config.go: $(SOURCES)/common/config/config.go.tpl
+$(SOURCES)/common/config/config.go: $(SOURCES)/common/config/config.go.tpl $(wildcard config.mk)
 	envsubst < $< > $@
 
 ## prepare go vendoring
@@ -56,7 +56,7 @@ $(SOURCES)/vendor: $(SOURCES)/glide.lock
 $(BINARIES)/spring $(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c $(SOURCES)/bootstrap/config.h $(C_FILES) | $(BINARIES)
 	gcc $< -o $@
 
-$(SOURCES)/bootstrap/config.h: $(SOURCES)/bootstrap/config.h.tpl
+$(SOURCES)/bootstrap/config.h: $(SOURCES)/bootstrap/config.h.tpl $(wildcard config.mk)
 	envsubst < $< > $@
 
 ## prepare directories
