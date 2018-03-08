@@ -70,6 +70,7 @@ $(DEB): $(BINARIES) meta/deb/*
 		cp "$$bin" "$(CONTENT)/usr/sbin/achelous-$$(basename $$bin)"; \
 	done
 	strip $(CONTENT)/usr/sbin/achelous-*
+	chmod 755 $(CONTENT)/usr/sbin/achelous-*
 	chmod ug+s $(CONTENT)/usr/sbin/achelous-spring
 	for alias in sendmail mailq newaliases; do \
 		ln -sf "achelous-spring" "$(CONTENT)/usr/sbin/$$alias"; \
