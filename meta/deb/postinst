@@ -15,12 +15,14 @@ case "$1" in
         if [ ! -d /var/spool/achelous ]; then
             mkdir -p /var/spool/achelous
             chown achelous:achelous /var/spool/achelous
+            chmod 750 /var/spool/achelous
         fi
 
         # create log dir
         if [ ! -d /var/log/achelous ]; then
             mkdir -p /var/log/achelous
             chown achelous:achelous /var/log/achelous
+            chmod 750 /var/log/achelous
         fi
     ;;
 
