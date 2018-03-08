@@ -7,9 +7,13 @@ SOURCES    = $(BUILDSPACE)/src/$(PACKAGE)
 BINARIES   = $(BUILDSPACE)/bin
 PACKSPACE  = .pack
 
-# source files
-GO_FILES = $(shell find $(SOURCES)/ -type f -name '*.go')
-C_FILES  = $(shell find $(SOURCES)/ -type f -name '*.c')
+# files
+GO_FILES = $(shell [ -d $(SOURCES)/ ] && find $(SOURCES)/ -type f -name '*.go' || true)
+C_FILES  = $(shell [ -d $(SOURCES)/ ] && find $(SOURCES)/ -type f -name '*.c' || true)
+
+BINARY_FILES = \
+	$(BINARIES)/spring-core $(BINARIES)/spring \
+	$(BINARIES)/upstream-core $(BINARIES)/upstream
 
 # build tools
 GO        = go
@@ -24,8 +28,7 @@ export VERSION      = 1.0-1
 # build target
 all: build
 
-build: $(BINARIES)/spring-core $(BINARIES)/spring
-build: $(BINARIES)/upstream-core $(BINARIES)/upstream
+build: $(BINARY_FILES)
 
 $(BINARIES)/spring-core: $(GO_FILES) $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ spring-core/main.go
@@ -57,15 +60,10 @@ $(BINARIES):
 	mkdir -p $@
 
 # pack target
-pack: pack_deb
+pack: $(PACKSPACE)/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb
 
-pack_deb: pack_assemble
-	mkdir -p $(PACKSPACE)/.build/root/DEBIAN
-	envsubst < $(PACKSPACE)/deb/control > $(PACKSPACE)/.build/root/DEBIAN/control
-	cp $(PACKSPACE)/deb/postinst $(PACKSPACE)/.build/root/DEBIAN/postinst
-	cd $(PACKSPACE)/.build && dpkg-deb --build root achelous_$(VERSION)_$(ARCHITECTURE).deb
-
-pack_assemble: build
+$(PACKSPACE)/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb: $(BINARY_FILES) $(PACKSPACE)/deb/*
+	# assemble files
 	mkdir -p $(PACKSPACE)/.build/root/usr/sbin
 	cp $(BINARIES)/spring $(PACKSPACE)/.build/root/usr/sbin/achelous-spring
 	cp $(BINARIES)/spring-core $(PACKSPACE)/.build/root/usr/sbin/achelous-spring-core
@@ -74,6 +72,11 @@ pack_assemble: build
 	ln -sf achelous-spring $(PACKSPACE)/.build/root/usr/sbin/sendmail
 	ln -sf achelous-spring $(PACKSPACE)/.build/root/usr/sbin/mailq
 	ln -sf achelous-spring $(PACKSPACE)/.build/root/usr/sbin/newaliases
+	# pack deb
+	mkdir -p $(PACKSPACE)/.build/root/DEBIAN
+	envsubst < $(PACKSPACE)/deb/control > $(PACKSPACE)/.build/root/DEBIAN/control
+	cp $(PACKSPACE)/deb/postinst $(PACKSPACE)/.build/root/DEBIAN/postinst
+	cd $(PACKSPACE)/.build && dpkg-deb --build root achelous_$(VERSION)_$(ARCHITECTURE).deb
 
 # cleanup target
 clean:
