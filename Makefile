@@ -8,8 +8,8 @@ BINARIES   = $(BUILDSPACE)/bin
 PACKSPACE  = .pack
 
 # files
-GO_FILES = $(shell [ -d $(SOURCES)/ ] && find $(SOURCES)/ -type f -name '*.go' || true)
-C_FILES  = $(shell [ -d $(SOURCES)/ ] && find $(SOURCES)/ -type f -name '*.c' || true)
+GO_FILES = $(shell find $(SOURCES)/ -type f -name '*.go')
+C_FILES  = $(shell find $(SOURCES)/ -type f -name '*.c')
 
 BINARY_FILES = \
 	$(BINARIES)/spring-core $(BINARIES)/spring \
@@ -37,42 +37,32 @@ all: build
 build: $(BINARY_FILES)
 
 ## build go binaries
-$(BINARIES)/spring-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
+$(BINARIES)/spring-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ spring-core/main.go
 
-$(BINARIES)/upstream-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
+$(BINARIES)/upstream-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ upstream-core/main.go
 
-$(SOURCES)/common/config/config.go: $(SOURCES)/common/config/config.go.tpl | $(SOURCES)
+$(SOURCES)/common/config/config.go: $(SOURCES)/common/config/config.go.tpl
 	envsubst < $< > $@
 
-$(SOURCES)/common/config/config.go.tpl: | $(SOURCES)
-
 ## prepare go vendoring
-$(SOURCES)/glide.lock: $(SOURCES)/glide.yaml | $(SOURCES)
+$(SOURCES)/glide.lock: $(SOURCES)/glide.yaml
 	cd $(SOURCES) && $(GLIDE) update
 	touch $@
 
-$(SOURCES)/glide.yaml: | $(SOURCES)
-
-$(SOURCES)/vendor: $(SOURCES)/glide.lock | $(SOURCES)
+$(SOURCES)/vendor: $(SOURCES)/glide.lock
 	cd $(SOURCES) && $(GLIDE) install
 	@touch $@
 
 ## build c binaries
-$(BINARIES)/spring $(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c $(SOURCES)/bootstrap/config.h $(C_FILES) | $(SOURCES) $(BINARIES)
+$(BINARIES)/spring $(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c $(SOURCES)/bootstrap/config.h $(C_FILES) | $(BINARIES)
 	gcc $< -o $@
 
-$(SOURCES)/bootstrap/config.h: $(SOURCES)/bootstrap/config.h.tpl | $(SOURCES)
+$(SOURCES)/bootstrap/config.h: $(SOURCES)/bootstrap/config.h.tpl
 	envsubst < $< > $@
 
-$(SOURCES)/bootstrap/config.h.tpl: | $(SOURCES)
-
 ## prepare directories
-$(SOURCES):
-	mkdir -p $(dir $@)
-	ln -sf $(CURDIR) $@
-
 $(BINARIES):
 	mkdir -p $@
 
