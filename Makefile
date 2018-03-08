@@ -86,6 +86,6 @@ $(PACKSPACE)/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb: $(BINARY_FILES) $(P
 clean:
 	rm -rf $(BUILDSPACE)/bin
 	rm -rf $(PACKSPACE)/.build
-	rm -rf vendor
 	rm -f bootstrap/config.h
 	rm -f common/config/config.go
+	rm -rf vendor
