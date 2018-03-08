@@ -34,12 +34,12 @@ $(SRC)/common/config/config.go: $(SRC)/common/config/config.go.tpl $(wildcard co
 	envsubst < $< > $@
 
 ## go vendoring
-$(SRC)/glide.lock: $(SRC)/glide.yaml
-	cd $(SRC) && $(GLIDE) update
+$(SRC)/vendor: $(SRC)/glide.lock
+	$(GLIDE) install
 	touch $@
 
-$(SRC)/vendor: $(SRC)/glide.lock
-	cd $(SRC) && $(GLIDE) install
+$(SRC)/glide.lock: $(SRC)/glide.yaml
+	$(GLIDE) update
 	touch $@
 
 ## build c sources
