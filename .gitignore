@@ -3,3 +3,4 @@
 /bootstrap/config.h
 /common/config/config.go
 /vendor
+/config.mk

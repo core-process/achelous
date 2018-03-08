@@ -29,6 +29,7 @@ export VERSION      = 1.0-1
 export CONFIG_USER  = achelous
 export CONFIG_GROUP = achelous
 export CONFIG_SPOOL = /var/spool/achelous
+-include config.mk
 
 # build target
 all: build
