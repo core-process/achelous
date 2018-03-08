@@ -1,27 +1,25 @@
 # package name
-PACKAGE   = github.com/core-process/achelous
+PACKAGE = github.com/core-process/achelous
 
 # directories
-BUILDSPACE = .build
-SOURCES    = $(BUILDSPACE)/src/$(PACKAGE)
-BINARIES   = $(BUILDSPACE)/bin
-PACKSPACE  = .pack
+SRC = .build/src/$(PACKAGE)
+BIN = .build/bin
 
 # files
-GO_FILES = $(shell find $(SOURCES)/ -type f -name '*.go')
-C_FILES  = $(shell find $(SOURCES)/ -type f -name '*.c')
+SOURCES_GO = $(shell find $(SRC)/ -type f -name '*.go')
+SOURCES_C  = $(shell find $(SRC)/ -type f -name '*.c')
 
-BINARY_FILES = \
-	$(BINARIES)/spring-core $(BINARIES)/spring \
-	$(BINARIES)/upstream-core $(BINARIES)/upstream
+BINARIES = \
+	$(BIN)/spring-core $(BIN)/spring \
+	$(BIN)/upstream-core $(BIN)/upstream
 
 # build tools
-GO        = go
-GLIDE     = glide
-GCC       = gcc
+GO    = go
+GLIDE = glide
+GCC   = gcc
 
 # environment
-export GOPATH       = $(CURDIR)/$(BUILDSPACE)
+export GOPATH       = $(CURDIR)/.build
 export ARCHITECTURE = $(subst x86_64,amd64,$(shell uname -m))
 export VERSION      = 1.0-1
 
@@ -34,58 +32,57 @@ export CONFIG_SPOOL = /var/spool/achelous
 # build target
 all: build
 
-build: $(BINARY_FILES)
+build: $(BINARIES)
 
 ## build go binaries
-$(BINARIES)/spring-core $(BINARIES)/upstream-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor Makefile | $(BINARIES)
-	cd $(SOURCES) && $(GO) build -o $@ $(notdir $@)/main.go
+$(BIN)/spring-core $(BIN)/upstream-core: $(SRC)/common/config/config.go $(SOURCES_GO) $(SRC)/vendor Makefile | $(BIN)
+	cd $(SRC) && $(GO) build -o $@ $(notdir $@)/main.go
 
-$(SOURCES)/common/config/config.go: $(SOURCES)/common/config/config.go.tpl $(wildcard config.mk)
+$(SRC)/common/config/config.go: $(SRC)/common/config/config.go.tpl $(wildcard config.mk)
 	envsubst < $< > $@
 
 ## prepare go vendoring
-$(SOURCES)/glide.lock: $(SOURCES)/glide.yaml
-	cd $(SOURCES) && $(GLIDE) update
+$(SRC)/glide.lock: $(SRC)/glide.yaml
+	cd $(SRC) && $(GLIDE) update
 	touch $@
 
-$(SOURCES)/vendor: $(SOURCES)/glide.lock
-	cd $(SOURCES) && $(GLIDE) install
+$(SRC)/vendor: $(SRC)/glide.lock
+	cd $(SRC) && $(GLIDE) install
 	touch $@
 
 ## build c binaries
-$(BINARIES)/spring $(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c $(SOURCES)/bootstrap/config.h $(C_FILES) Makefile | $(BINARIES)
+$(BIN)/spring $(BIN)/upstream: $(SRC)/bootstrap/main.c $(SRC)/bootstrap/config.h $(SOURCES_C) Makefile | $(BIN)
 	gcc $< -o $@
 
-$(SOURCES)/bootstrap/config.h: $(SOURCES)/bootstrap/config.h.tpl $(wildcard config.mk)
+$(SRC)/bootstrap/config.h: $(SRC)/bootstrap/config.h.tpl $(wildcard config.mk)
 	envsubst < $< > $@
 
 ## prepare directories
-$(BINARIES):
+$(BIN):
 	mkdir -p $@
 
 # pack target
-pack: $(PACKSPACE)/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb
+pack: .pack/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb
 
-$(PACKSPACE)/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb: $(BINARY_FILES) $(PACKSPACE)/deb/*
+.pack/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb: $(BINARIES) .pack/deb/*
 	# assemble files
-	mkdir -p $(PACKSPACE)/.build/root/usr/sbin
-	cp $(BINARIES)/spring $(PACKSPACE)/.build/root/usr/sbin/achelous-spring
-	cp $(BINARIES)/spring-core $(PACKSPACE)/.build/root/usr/sbin/achelous-spring-core
-	cp $(BINARIES)/upstream $(PACKSPACE)/.build/root/usr/sbin/achelous-upstream
-	cp $(BINARIES)/upstream-core $(PACKSPACE)/.build/root/usr/sbin/achelous-upstream-core
-	ln -sf achelous-spring $(PACKSPACE)/.build/root/usr/sbin/sendmail
-	ln -sf achelous-spring $(PACKSPACE)/.build/root/usr/sbin/mailq
-	ln -sf achelous-spring $(PACKSPACE)/.build/root/usr/sbin/newaliases
+	mkdir -p .pack/.build/root/usr/sbin
+	for bin in $(BINARIES); do \
+		cp "$$bin" ".pack/.build/root/usr/sbin/achelous-$$(basename $$bin)"; \
+	done
+	for alias in sendmail mailq newaliases; do \
+		ln -sf "achelous-spring" ".pack/.build/root/usr/sbin/$$alias"; \
+	done
 	# pack deb
-	mkdir -p $(PACKSPACE)/.build/root/DEBIAN
-	envsubst < $(PACKSPACE)/deb/control > $(PACKSPACE)/.build/root/DEBIAN/control
-	cp $(PACKSPACE)/deb/postinst $(PACKSPACE)/.build/root/DEBIAN/postinst
-	cd $(PACKSPACE)/.build && dpkg-deb --build root achelous_$(VERSION)_$(ARCHITECTURE).deb
+	mkdir -p .pack/.build/root/DEBIAN
+	cp .pack/deb/* .pack/.build/root/DEBIAN/
+	envsubst < .pack/deb/control > .pack/.build/root/DEBIAN/control
+	cd .pack/.build && dpkg-deb --build root achelous_$(VERSION)_$(ARCHITECTURE).deb
 
 # cleanup target
 clean:
-	rm -rf $(BUILDSPACE)/bin
-	rm -rf $(PACKSPACE)/.build
+	rm -rf .build/bin
+	rm -rf .pack/.build
 	rm -f bootstrap/config.h
 	rm -f common/config/config.go
 	rm -rf vendor
