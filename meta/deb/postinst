@@ -6,9 +6,8 @@ case "$1" in
     configure)
         # create a achelous group and user
         if ! getent passwd achelous >/dev/null 2>&1; then
-            adduser --system --uid 899 --home /var/spool/achelous achelous
             addgroup --system --gid 899 achelous
-            adduser achelous achelous
+            adduser --system --uid 899 --gid 899 --home /var/spool/achelous achelous
         fi
 
         # create spool dir

@@ -8,3 +8,5 @@
 /vendor
 
 /settings.user.mk
+
+/*.log
