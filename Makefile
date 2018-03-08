@@ -63,9 +63,18 @@ dist: $(DEB)
 
 $(DEB): CONTENT = .build/dist/content
 $(DEB): $(BINARIES) meta/deb/*
-	# assemble files
+	# create directories
+	mkdir -p $(CONTENT)/DEBIAN
 	mkdir -p $(CONTENT)/usr/sbin
+	mkdir -p $(CONTENT)/usr/share/doc/achelous
 	chmod -R 755 $(CONTENT)
+	# assemble meta
+	envsubst < meta/deb/control > $(CONTENT)/DEBIAN/control
+	cp meta/deb/postinst $(CONTENT)/DEBIAN/
+	gzip --best -n < meta/deb/changelog > $(CONTENT)/usr/share/doc/achelous/changelog.Debian.gz
+	cp meta/deb/copyright $(CONTENT)/usr/share/doc/achelous/
+	chmod 644 $(CONTENT)/usr/share/doc/achelous/*
+	# assemble content
 	for bin in $(BINARIES); do \
 		cp "$$bin" "$(CONTENT)/usr/sbin/achelous-$$(basename $$bin)"; \
 	done
@@ -76,9 +85,6 @@ $(DEB): $(BINARIES) meta/deb/*
 		ln -sf "achelous-spring" "$(CONTENT)/usr/sbin/$$alias"; \
 	done
 	# pack deb
-	mkdir -p $(CONTENT)/DEBIAN
-	cp meta/deb/* $(CONTENT)/DEBIAN/
-	envsubst < meta/deb/control > $(CONTENT)/DEBIAN/control
 	cd .build/dist && fakeroot dpkg-deb --build content $(notdir $@)
 
 # cleanup target

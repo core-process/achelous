@@ -1,0 +1,8 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: achelous
+Upstream-Contact: Niklas Salmoukas <niklas@salmoukas.com>
+Source: https://github.com/core-process/achelous
+
+Files: *
+Copyright: 2018 Niklas Salmoukas
+License: GPL-3.0-or-later
