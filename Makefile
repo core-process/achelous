@@ -37,7 +37,7 @@ all: build
 build: $(BINARY_FILES)
 
 ## build go binaries
-$(BINARIES)/spring-core $(BINARIES)/upstream-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(BINARIES)
+$(BINARIES)/spring-core $(BINARIES)/upstream-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor Makefile | $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ $(notdir $@)/main.go
 
 $(SOURCES)/common/config/config.go: $(SOURCES)/common/config/config.go.tpl $(wildcard config.mk)
@@ -53,7 +53,7 @@ $(SOURCES)/vendor: $(SOURCES)/glide.lock
 	touch $@
 
 ## build c binaries
-$(BINARIES)/spring $(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c $(SOURCES)/bootstrap/config.h $(C_FILES) | $(BINARIES)
+$(BINARIES)/spring $(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c $(SOURCES)/bootstrap/config.h $(C_FILES) Makefile | $(BINARIES)
 	gcc $< -o $@
 
 $(SOURCES)/bootstrap/config.h: $(SOURCES)/bootstrap/config.h.tpl $(wildcard config.mk)
