@@ -7,19 +7,18 @@
 #include <errno.h>
 #include <linux/limits.h>
 
-#define ACHELOUS_USER "achelous"
-#define ACHELOUS_GROUP "achelous"
+#include "config.h"
 
 int switch_user()
 {
-    struct group* g = getgrnam(ACHELOUS_GROUP);
+    struct group* g = getgrnam(CONFIG_GROUP);
     if(g == NULL)
     {
         errno = EINVAL;
         return -1;
     }
 
-    struct passwd* u = getpwnam(ACHELOUS_USER);
+    struct passwd* u = getpwnam(CONFIG_USER);
     if(u == NULL)
     {
         errno = EINVAL;

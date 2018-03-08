@@ -1,3 +1,5 @@
 /.build
 /.pack/.build
+/bootstrap/config.h
+/common/config/config.go
 /vendor

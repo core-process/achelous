@@ -1,18 +1,15 @@
 package queue
 
 import (
-	"os/user"
 	"path"
+
+	"github.com/core-process/achelous/common/config"
 
 	"github.com/oklog/ulid"
 )
 
 func QueuePath(queue QueueRef) string {
-	user, err := user.Current()
-	if err != nil {
-		panic(err)
-	}
-	return path.Join(user.HomeDir, ".achelous/queues", string(queue))
+	return path.Join(config.Spool, string(queue))
 }
 
 func MessagePath(queue QueueRef, msgId ulid.ULID, status MessageStatus) string {

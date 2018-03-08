@@ -25,23 +25,27 @@ export GOPATH       = $(CURDIR)/$(BUILDSPACE)
 export ARCHITECTURE = $(subst x86_64,amd64,$(shell uname -m))
 export VERSION      = 1.0-1
 
+# configuration
+export CONFIG_USER  = achelous
+export CONFIG_GROUP = achelous
+export CONFIG_SPOOL = /var/spool/achelous
+
 # build target
 all: build
 
 build: $(BINARY_FILES)
 
-$(BINARIES)/spring-core: $(GO_FILES) $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
+## build go binaries
+$(BINARIES)/spring-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ spring-core/main.go
 
-$(BINARIES)/upstream-core: $(GO_FILES) $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
+$(BINARIES)/upstream-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(SOURCES) $(BINARIES)
 	cd $(SOURCES) && $(GO) build -o $@ upstream-core/main.go
 
-$(BINARIES)/spring: $(C_FILES) $(SOURCES)/bootstrap/main.c | $(SOURCES) $(BINARIES)
-	gcc $(SOURCES)/bootstrap/main.c -o $@
+$(SOURCES)/common/config/config.go: $(SOURCES)/common/config/config.go.tpl | $(SOURCES)
+	envsubst < $< > $@
 
-$(BINARIES)/upstream: $(C_FILES) $(SOURCES)/bootstrap/main.c | $(SOURCES) $(BINARIES)
-	gcc $(SOURCES)/bootstrap/main.c -o $@
-
+## prepare go vendoring
 $(SOURCES)/glide.lock: $(SOURCES)/glide.yaml | $(SOURCES)
 	cd $(SOURCES) && $(GLIDE) update
 	touch $@
@@ -52,6 +56,14 @@ $(SOURCES)/vendor: $(SOURCES)/glide.lock | $(SOURCES)
 	cd $(SOURCES) && $(GLIDE) install
 	@touch $@
 
+## build c binaries
+$(BINARIES)/spring $(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c $(SOURCES)/bootstrap/config.h $(C_FILES) | $(SOURCES) $(BINARIES)
+	gcc $< -o $@
+
+$(SOURCES)/bootstrap/config.h: $(SOURCES)/bootstrap/config.h.tpl | $(SOURCES)
+	envsubst < $< > $@
+
+## prepare directories
 $(SOURCES):
 	mkdir -p $(dir $@)
 	ln -sf $(CURDIR) $@
