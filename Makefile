@@ -28,7 +28,7 @@ build: $(BINARIES)
 
 ## build go sources
 $(BIN)/spring-core $(BIN)/upstream-core: $(SRC)/common/config/config.go $(SOURCES_GO) $(SRC)/vendor Makefile | $(BIN)
-	cd $(SRC) && $(GO) build -o $@ $(notdir $@)/main.go
+	cd $(SRC) && $(GO) build -buildmode=pie -o $@ $(notdir $@)/main.go
 
 $(SRC)/common/config/config.go: $(SRC)/common/config/config.go.tpl $(wildcard config.mk)
 	envsubst < $< > $@
@@ -56,15 +56,20 @@ $(BIN):
 # dist target
 DEB = .build/dist/achelous_$(VERSION)_$(ARCHITECTURE).deb
 
+# NOTE: use the following command to verify quality of deb file:
+# lintian --no-tag-display-limit .build/dist/achelous_1.0-1_amd64.deb
+
 dist: $(DEB)
 
 $(DEB): CONTENT = .build/dist/content
 $(DEB): $(BINARIES) meta/deb/*
 	# assemble files
 	mkdir -p $(CONTENT)/usr/sbin
+	chmod -R 755 $(CONTENT)
 	for bin in $(BINARIES); do \
 		cp "$$bin" "$(CONTENT)/usr/sbin/achelous-$$(basename $$bin)"; \
 	done
+	strip $(CONTENT)/usr/sbin/achelous-*
 	for alias in sendmail mailq newaliases; do \
 		ln -sf "achelous-spring" "$(CONTENT)/usr/sbin/$$alias"; \
 	done
