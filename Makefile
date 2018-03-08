@@ -53,28 +53,28 @@ $(SRC)/bootstrap/config.h: $(SRC)/bootstrap/config.h.tpl $(wildcard config.mk)
 $(BIN):
 	mkdir -p $@
 
-# pack target
-pack: .pack/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb
+# dist target
+dist: .build/dist/achelous_$(VERSION)_$(ARCHITECTURE).deb
 
-.pack/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb: $(BINARIES) .pack/deb/*
+.build/dist/achelous_$(VERSION)_$(ARCHITECTURE).deb: $(BINARIES) meta/deb/*
 	# assemble files
-	mkdir -p .pack/.build/root/usr/sbin
+	mkdir -p .build/dist/content/usr/sbin
 	for bin in $(BINARIES); do \
-		cp "$$bin" ".pack/.build/root/usr/sbin/achelous-$$(basename $$bin)"; \
+		cp "$$bin" ".build/dist/content/usr/sbin/achelous-$$(basename $$bin)"; \
 	done
 	for alias in sendmail mailq newaliases; do \
-		ln -sf "achelous-spring" ".pack/.build/root/usr/sbin/$$alias"; \
+		ln -sf "achelous-spring" ".build/dist/content/usr/sbin/$$alias"; \
 	done
 	# pack deb
-	mkdir -p .pack/.build/root/DEBIAN
-	cp .pack/deb/* .pack/.build/root/DEBIAN/
-	envsubst < .pack/deb/control > .pack/.build/root/DEBIAN/control
-	cd .pack/.build && dpkg-deb --build root achelous_$(VERSION)_$(ARCHITECTURE).deb
+	mkdir -p .build/dist/content/DEBIAN
+	cp meta/deb/* .build/dist/content/DEBIAN/
+	envsubst < meta/deb/control > .build/dist/content/DEBIAN/control
+	cd .build/dist && dpkg-deb --build content $(notdir $@)
 
 # cleanup target
 clean:
 	rm -rf .build/bin
-	rm -rf .pack/.build
+	rm -rf .build/dist
 	rm -f bootstrap/config.h
 	rm -f common/config/config.go
 	rm -rf vendor
