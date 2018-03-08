@@ -50,7 +50,7 @@ $(SOURCES)/glide.lock: $(SOURCES)/glide.yaml
 
 $(SOURCES)/vendor: $(SOURCES)/glide.lock
 	cd $(SOURCES) && $(GLIDE) install
-	@touch $@
+	touch $@
 
 ## build c binaries
 $(BINARIES)/spring $(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c $(SOURCES)/bootstrap/config.h $(C_FILES) | $(BINARIES)
