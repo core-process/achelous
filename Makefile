@@ -30,7 +30,7 @@ build: $(BINARIES)
 $(BIN)/spring-core $(BIN)/upstream-core: $(SRC)/common/config/config.go $(SOURCES_GO) $(SRC)/vendor Makefile | $(BIN)
 	cd $(SRC) && $(GO) build -buildmode=pie -o $@ $(notdir $@)/main.go
 
-$(SRC)/common/config/config.go: $(SRC)/common/config/config.go.tpl $(wildcard config.mk)
+$(SRC)/common/config/config.go: $(SRC)/common/config/config.go.tpl $(wildcard settings*.mk)
 	envsubst < $< > $@
 
 ## go vendoring
@@ -46,7 +46,7 @@ $(SRC)/glide.lock: $(SRC)/glide.yaml
 $(BIN)/spring $(BIN)/upstream: $(SRC)/bootstrap/main.c $(SRC)/bootstrap/config.h $(SOURCES_C) Makefile | $(BIN)
 	gcc $< -o $@
 
-$(SRC)/bootstrap/config.h: $(SRC)/bootstrap/config.h.tpl $(wildcard config.mk)
+$(SRC)/bootstrap/config.h: $(SRC)/bootstrap/config.h.tpl $(wildcard settings*.mk)
 	envsubst < $< > $@
 
 ## prepare binary directory
@@ -70,6 +70,7 @@ $(DEB): $(BINARIES) meta/deb/*
 		cp "$$bin" "$(CONTENT)/usr/sbin/achelous-$$(basename $$bin)"; \
 	done
 	strip $(CONTENT)/usr/sbin/achelous-*
+	chmod ug+s $(CONTENT)/usr/sbin/achelous-spring
 	for alias in sendmail mailq newaliases; do \
 		ln -sf "achelous-spring" "$(CONTENT)/usr/sbin/$$alias"; \
 	done
