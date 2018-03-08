@@ -5,8 +5,8 @@
 		}
 	],
 	"settings": {
-		// Set GOPATH to workspace directory
-		"go.gopath": "${workspaceFolder}/../../../../",
+		// Set GOPATH to .build directory
+		"go.inferGopath": true,
 		"terminal.integrated.env.linux": {
 			"GOPATH": "${workspaceFolder}/../../../../"
 		},
