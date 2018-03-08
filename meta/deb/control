@@ -4,7 +4,10 @@ Section: mail
 Priority: optional
 Architecture: ${ARCHITECTURE}
 Depends: adduser, libc6
+Replaces: mail-transport-agent
+Provides: mail-transport-agent
 Maintainer: Niklas Salmoukas <niklas@salmoukas.com>
+Homepage: https://github.com/core-process/achelous
 Description: Sendmail replacement, which queues and uploads
  emails to a webservice. It is designed for IoT devices and
  containers, which might send emails for administrative
