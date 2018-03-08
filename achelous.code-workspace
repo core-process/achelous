@@ -5,7 +5,7 @@
 		}
 	],
 	"settings": {
-		"go.buildOnSave": "workspace",
+		"go.buildOnSave": "off",
 		// Set GOPATH to .build directory
 		"go.gopath": "${workspaceFolder}/.build",
 		"terminal.integrated.env.linux": {
