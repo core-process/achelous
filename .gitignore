@@ -9,4 +9,5 @@
 
 /settings.user.mk
 
+/.vagrant
 /*.log
