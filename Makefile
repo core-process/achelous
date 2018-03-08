@@ -78,6 +78,7 @@ $(DEB): $(BINARIES) meta/deb/*
 clean:
 	rm -rf .build/bin
 	rm -rf .build/dist
+	rm -rf .build/pkg
 	rm -f bootstrap/config.h
 	rm -f common/config/config.go
 	rm -rf vendor

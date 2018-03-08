@@ -1,5 +1,6 @@
 /.build/bin
 /.build/dist
+/.build/pkg
 /bootstrap/config.h
 /common/config/config.go
 /vendor
