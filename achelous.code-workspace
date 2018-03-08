@@ -5,9 +5,12 @@
 		}
 	],
 	"settings": {
+		// Do not build within VSC, because it is not
+		// compatible with the current workspace structure
 		"go.buildOnSave": "off",
-		// Set GOPATH to .build directory
+		// Set GOPATH for VSC integration
 		"go.gopath": "${workspaceFolder}/.build",
+		// Set GOPATH within integrated terminal
 		"terminal.integrated.env.linux": {
 			"GOPATH": "${workspaceFolder}/.build"
 		},
@@ -18,7 +21,7 @@
 			"GOPATH": "${workspaceFolder}/.build"
 		},
 		// Set path to required Go tools
-		// Add ~/.gotools/bin to your PATH and restart Visual Studio Code
+		// Note: add ~/.gotools/bin to your PATH and restart VSC
 		"go.toolsGopath": "~/.gotools"
 	}
 }
