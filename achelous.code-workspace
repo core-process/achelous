@@ -1,20 +1,21 @@
 {
 	"folders": [
 		{
-			"path": "./.build/src/github.com/core-process/achelous"
+			"path": "."
 		}
 	],
 	"settings": {
+		"go.buildOnSave": "workspace",
 		// Set GOPATH to .build directory
-		"go.inferGopath": true,
+		"go.gopath": "${workspaceFolder}/.build",
 		"terminal.integrated.env.linux": {
-			"GOPATH": "${workspaceFolder}/../../../../"
+			"GOPATH": "${workspaceFolder}/.build"
 		},
 		"terminal.integrated.env.osx": {
-			"GOPATH": "${workspaceFolder}/../../../../"
+			"GOPATH": "${workspaceFolder}/.build"
 		},
 		"terminal.integrated.env.windows": {
-			"GOPATH": "${workspaceFolder}/../../../../"
+			"GOPATH": "${workspaceFolder}/.build"
 		},
 		// Set path to required Go tools
 		// Add ~/.gotools/bin to your PATH and restart Visual Studio Code
