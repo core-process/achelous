@@ -45,6 +45,8 @@ $(BINARIES)/upstream-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOUR
 $(SOURCES)/common/config/config.go: $(SOURCES)/common/config/config.go.tpl | $(SOURCES)
 	envsubst < $< > $@
 
+$(SOURCES)/common/config/config.go.tpl: | $(SOURCES)
+
 ## prepare go vendoring
 $(SOURCES)/glide.lock: $(SOURCES)/glide.yaml | $(SOURCES)
 	cd $(SOURCES) && $(GLIDE) update
@@ -62,6 +64,8 @@ $(BINARIES)/spring $(BINARIES)/upstream: $(SOURCES)/bootstrap/main.c $(SOURCES)/
 
 $(SOURCES)/bootstrap/config.h: $(SOURCES)/bootstrap/config.h.tpl | $(SOURCES)
 	envsubst < $< > $@
+
+$(SOURCES)/bootstrap/config.h.tpl: | $(SOURCES)
 
 ## prepare directories
 $(SOURCES):
@@ -94,3 +98,5 @@ $(PACKSPACE)/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb: $(BINARY_FILES) $(P
 clean:
 	rm -rf $(BUILDSPACE)
 	rm -rf $(PACKSPACE)/.build
+	rm -f bootstrap/config.h
+	rm -f common/config/config.go
