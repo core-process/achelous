@@ -1,4 +1,4 @@
-# package name
+# package
 PACKAGE = github.com/core-process/achelous
 
 # directories
@@ -13,35 +13,27 @@ BINARIES = \
 	$(BIN)/spring-core $(BIN)/spring \
 	$(BIN)/upstream-core $(BIN)/upstream
 
-# build tools
-GO    = go
-GLIDE = glide
-GCC   = gcc
-
 # environment
 export GOPATH       = $(CURDIR)/.build
 export ARCHITECTURE = $(subst x86_64,amd64,$(shell uname -m))
-export VERSION      = 1.0-1
 
-# configuration
-export CONFIG_USER  = achelous
-export CONFIG_GROUP = achelous
-export CONFIG_SPOOL = /var/spool/achelous
--include config.mk
+# settings
+include settings.mk
+-include settings.user.mk
 
 # build target
 all: build
 
 build: $(BINARIES)
 
-## build go binaries
+## build go sources
 $(BIN)/spring-core $(BIN)/upstream-core: $(SRC)/common/config/config.go $(SOURCES_GO) $(SRC)/vendor Makefile | $(BIN)
 	cd $(SRC) && $(GO) build -o $@ $(notdir $@)/main.go
 
 $(SRC)/common/config/config.go: $(SRC)/common/config/config.go.tpl $(wildcard config.mk)
 	envsubst < $< > $@
 
-## prepare go vendoring
+## go vendoring
 $(SRC)/glide.lock: $(SRC)/glide.yaml
 	cd $(SRC) && $(GLIDE) update
 	touch $@
@@ -50,14 +42,14 @@ $(SRC)/vendor: $(SRC)/glide.lock
 	cd $(SRC) && $(GLIDE) install
 	touch $@
 
-## build c binaries
+## build c sources
 $(BIN)/spring $(BIN)/upstream: $(SRC)/bootstrap/main.c $(SRC)/bootstrap/config.h $(SOURCES_C) Makefile | $(BIN)
 	gcc $< -o $@
 
 $(SRC)/bootstrap/config.h: $(SRC)/bootstrap/config.h.tpl $(wildcard config.mk)
 	envsubst < $< > $@
 
-## prepare directories
+## prepare binary directory
 $(BIN):
 	mkdir -p $@
 
