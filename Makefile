@@ -72,7 +72,7 @@ $(DEB): $(BINARIES) meta/deb/*
 	mkdir -p $(CONTENT)/DEBIAN
 	cp meta/deb/* $(CONTENT)/DEBIAN/
 	envsubst < meta/deb/control > $(CONTENT)/DEBIAN/control
-	cd .build/dist && dpkg-deb --build content $(notdir $@)
+	cd .build/dist && fakeroot dpkg-deb --build content $(notdir $@)
 
 # cleanup target
 clean:
