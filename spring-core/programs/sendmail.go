@@ -16,7 +16,7 @@ import (
 func Sendmail(smArgs *args.SmArgs, recipients []string) error {
 
 	// filter stdin and stop at single-dot-line
-	ignoreDot := smArgs.Arg_i || smArgs.Arg_O.Opt_IgnoreDots
+	ignoreDot := smArgs.Arg_i || smArgs.Arg_oi || smArgs.Arg_O.Opt_IgnoreDots
 
 	filterReader, filterWriter := io.Pipe()
 

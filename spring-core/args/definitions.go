@@ -56,10 +56,6 @@ const (
 // -O option=value
 //             Set option option to the specified value. This form uses long
 //             names. See below for more details.
-// -ox value   Set option x to the specified value. This form uses single
-//             character names only. The short names are not described in
-//             this manual page; see the Sendmail Installation and Operation
-//             Guide for details.
 type SmArg_O struct {
 
 	// AliasFile=file
@@ -316,11 +312,14 @@ type SmArgs struct {
 	// -O option=value
 	//             Set option option to the specified value. This form uses long
 	//             names. See below for more details.
+	Arg_O SmArg_O `args:"value"`
+
 	// -ox value   Set option x to the specified value. This form uses single
 	//             character names only. The short names are not described in
 	//             this manual page; see the Sendmail Installation and Operation
 	//             Guide for details.
-	Arg_O SmArg_O `args:"value"`
+	// NOTE: we support -oi only for now
+	Arg_oi bool `args:"flag"`
 
 	// -pprotocol  Set the name of the protocol used to receive the message.
 	//             This can be a simple protocol name such as ``UUCP'' or a pro-
