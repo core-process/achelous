@@ -54,21 +54,24 @@ $(BIN):
 	mkdir -p $@
 
 # dist target
-dist: .build/dist/achelous_$(VERSION)_$(ARCHITECTURE).deb
+DEB = .build/dist/achelous_$(VERSION)_$(ARCHITECTURE).deb
 
-.build/dist/achelous_$(VERSION)_$(ARCHITECTURE).deb: $(BINARIES) meta/deb/*
+dist: $(DEB)
+
+$(DEB): CONTENT = .build/dist/content
+$(DEB): $(BINARIES) meta/deb/*
 	# assemble files
-	mkdir -p .build/dist/content/usr/sbin
+	mkdir -p $(CONTENT)/usr/sbin
 	for bin in $(BINARIES); do \
-		cp "$$bin" ".build/dist/content/usr/sbin/achelous-$$(basename $$bin)"; \
+		cp "$$bin" "$(CONTENT)/usr/sbin/achelous-$$(basename $$bin)"; \
 	done
 	for alias in sendmail mailq newaliases; do \
-		ln -sf "achelous-spring" ".build/dist/content/usr/sbin/$$alias"; \
+		ln -sf "achelous-spring" "$(CONTENT)/usr/sbin/$$alias"; \
 	done
 	# pack deb
-	mkdir -p .build/dist/content/DEBIAN
-	cp meta/deb/* .build/dist/content/DEBIAN/
-	envsubst < meta/deb/control > .build/dist/content/DEBIAN/control
+	mkdir -p $(CONTENT)/DEBIAN
+	cp meta/deb/* $(CONTENT)/DEBIAN/
+	envsubst < meta/deb/control > $(CONTENT)/DEBIAN/control
 	cd .build/dist && dpkg-deb --build content $(notdir $@)
 
 # cleanup target
