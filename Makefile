@@ -37,11 +37,8 @@ all: build
 build: $(BINARY_FILES)
 
 ## build go binaries
-$(BINARIES)/spring-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(BINARIES)
-	cd $(SOURCES) && $(GO) build -o $@ spring-core/main.go
-
-$(BINARIES)/upstream-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(BINARIES)
-	cd $(SOURCES) && $(GO) build -o $@ upstream-core/main.go
+$(BINARIES)/spring-core $(BINARIES)/upstream-core: $(SOURCES)/common/config/config.go $(GO_FILES) $(SOURCES)/vendor | $(BINARIES)
+	cd $(SOURCES) && $(GO) build -o $@ $(notdir $@)/main.go
 
 $(SOURCES)/common/config/config.go: $(SOURCES)/common/config/config.go.tpl
 	envsubst < $< > $@
@@ -89,5 +86,6 @@ $(PACKSPACE)/.build/achelous_$(VERSION)_$(ARCHITECTURE).deb: $(BINARY_FILES) $(P
 clean:
 	rm -rf $(BUILDSPACE)/bin
 	rm -rf $(PACKSPACE)/.build
+	rm -rf vendor
 	rm -f bootstrap/config.h
 	rm -f common/config/config.go
