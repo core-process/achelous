@@ -16,7 +16,7 @@ extern int readpid (char *pidfile);
 
 pid_t corepid = -1;
 
-void signal2core(int signum)
+void SIG_CORE(int signum)
 {
     syslog(LOG_INFO, "propagating signal %d to core process", signum);
     kill(corepid, signum);
@@ -72,7 +72,14 @@ void cmdstart(int daemon, char **argv)
     }
 
     // wait for core process to end
-    signal(SIGINT, signal2core);
+    if(daemon != 0)
+    {
+        signal(SIGINT, SIG_CORE);
+    }
+    else
+    {
+        signal(SIGINT, SIG_IGN);
+    }
 
     if(waitpid(corepid, NULL, 0) == -1)
     {
