@@ -5,10 +5,7 @@ PACKAGE = github.com/core-process/achelous
 SRC = .build/src/$(PACKAGE)
 BIN = .build/bin
 
-# files
-SOURCES_GO = $(shell find $(SRC)/ -type f -name '*.go')
-SOURCES_C  = $(shell find $(SRC)/ -type f -name '*.c')
-
+# binaries
 BINARIES = \
 	$(BIN)/spring-core $(BIN)/spring \
 	$(BIN)/upstream-core $(BIN)/upstream
@@ -27,7 +24,7 @@ all: build
 build: $(BINARIES)
 
 ## build go sources
-$(BIN)/spring-core $(BIN)/upstream-core: $(SRC)/common/config/config.go $(SOURCES_GO) $(SRC)/vendor Makefile | $(BIN)
+$(BIN)/spring-core $(BIN)/upstream-core: $(SRC)/common/config/config.go $(shell find $(SRC)/ -type f -name '*.go') $(SRC)/vendor | $(BIN)
 	cd $(SRC) && $(GO) build -buildmode=pie -o $@ $(notdir $@)/main.go
 
 $(SRC)/common/config/config.go: $(SRC)/common/config/config.go.tpl $(wildcard settings*.mk)
@@ -43,8 +40,11 @@ $(SRC)/glide.lock: $(SRC)/glide.yaml
 	touch $@
 
 ## build c sources
-$(BIN)/spring $(BIN)/upstream: $(SRC)/bootstrap/main.c $(SRC)/bootstrap/config.h $(SOURCES_C) Makefile | $(BIN)
-	gcc $< -o $@
+$(BIN)/spring: $(SRC)/bootstrap/spring.c $(SRC)/bootstrap/switchuser.c $(SRC)/bootstrap/coreprocess.c $(SRC)/bootstrap/config.h | $(BIN)
+	gcc $(filter %.c,$^) -o $@
+
+$(BIN)/upstream: $(SRC)/bootstrap/upstream.c $(SRC)/bootstrap/switchuser.c $(SRC)/bootstrap/coreprocess.c $(SRC)/bootstrap/daemonise.c $(SRC)/bootstrap/config.h | $(BIN)
+	gcc $(filter %.c,$^) -o $@
 
 $(SRC)/bootstrap/config.h: $(SRC)/bootstrap/config.h.tpl $(wildcard settings*.mk)
 	envsubst < $< > $@

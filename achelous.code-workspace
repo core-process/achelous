@@ -22,6 +22,15 @@
 		},
 		// Set path to required Go tools
 		// Note: add ~/.gotools/bin to your PATH and restart VSC
-		"go.toolsGopath": "~/.gotools"
+		"go.toolsGopath": "~/.gotools",
+		"files.associations": {
+			"errno.h": "c",
+			"limits.h": "c",
+			"types.h": "c",
+			"unistd.h": "c",
+			"fcntl.h": "c",
+			"syslog.h": "c",
+			"grp.h": "c"
+		}
 	}
 }
