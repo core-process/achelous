@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"io"
 	"log"
 	"log/syslog"
@@ -30,23 +31,23 @@ func main() {
 		syscall.SIGQUIT,
 	)
 
-	cexit := make(chan bool, 1)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	go func() {
 		sig := <-csig
 		log.Println("exiting... (" + sig.String() + ")")
-		cexit <- true
+		cancel()
 	}()
 
 	// main loop
 	for true {
 		select {
-		case <-cexit:
+		case <-ctx.Done():
 			log.Println("core completed")
 			os.Exit(0)
 		case <-time.After(5 * time.Second):
-			processor.Run(cexit)
+			processor.Run(ctx)
 		}
 	}
-
-	// TODO: fix cancellation case in processor (we still need to terminate main loop then)
 }
