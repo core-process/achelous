@@ -9,8 +9,7 @@ import (
 )
 
 func main() {
-
-	// Configure logger to write to the syslog
+	// configure logger to write to the syslog
 	logwriter, err := syslog.New(syslog.LOG_DEBUG|syslog.LOG_MAIL, "achelous/upstream-core")
 	if err != nil {
 		log.Println(err)

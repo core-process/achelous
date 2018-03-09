@@ -1,7 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"io"
+	"log"
+	"log/syslog"
 	"os"
 
 	"github.com/core-process/achelous/spring-core/args"
@@ -9,10 +11,18 @@ import (
 )
 
 func main() {
+	// configure logger to write to the syslog
+	logwriter, err := syslog.New(syslog.LOG_DEBUG|syslog.LOG_MAIL, "achelous/spring-core")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	log.SetOutput(io.MultiWriter(logwriter, os.Stderr))
+
 	// parse arguments
 	program, smArgs, mqArgs, values, err := args.Parse(os.Args)
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		os.Exit(1)
 	}
 
@@ -25,7 +35,7 @@ func main() {
 	}
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		os.Exit(2)
 	}
 
