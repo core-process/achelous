@@ -24,7 +24,16 @@ func Run(ctx context.Context) {
 	// upload channel
 	cupload := make(chan [2]string)
 
+	go func() {
+		for item := range cupload {
+			log.Printf("fake-uploading message %s of queue %s", item[1], item[0])
+		}
+	}()
+
 	// read file queues
+	pext := "." + string(queuepkg.MessageStatusPreparing)
+	qext := "." + string(queuepkg.MessageStatusQueued)
+
 	for queues.Len() > 0 {
 		// check if we have to exit early
 		select {
@@ -72,18 +81,22 @@ func Run(ctx context.Context) {
 			stat, err := os.Stat(path.Join(config.Spool, queue, entry))
 			if err != nil {
 				log.Printf("could not retrieve file info for entry %s in queue %s: %v", entry, queue, err)
-				allOk = false
+				if !strings.HasSuffix(entry, pext) {
+					// in case the error occured while stat'ing a potentially item in preparing
+					// state, we will not include this as an invalid operation. this might happen
+					// due to race conditions, which are happening by design in this case.
+					allOk = false
+				}
 				continue
 			}
 
 			// handle entry
 			if stat.Mode().IsDir() {
 				// push to list of queues
-				queues.PushBack(entry)
+				queues.PushBack(path.Join(queue, entry))
 
 			} else if stat.Mode().IsRegular() {
 				// push to upload channel (if queued item)
-				qext := "." + string(queuepkg.MessageStatusQueued)
 				if strings.HasSuffix(entry, qext) {
 					id := entry[0 : len(entry)-len(qext)]
 					cupload <- [2]string{queue, id}
