@@ -1,9 +1,14 @@
-extern void switchuser();
-extern void coreprocess(char** argv);
+#include <syslog.h>
 
-int main(int argc, char** argv)
+extern void switchuser();
+extern void coreprocess(char **argv);
+
+int main(int argc, char **argv)
 {
+    openlog("achelous-spring", LOG_PERROR|LOG_PID, LOG_MAIL);
+
     switchuser();
     coreprocess(argv);
+
     return 0;
 }
