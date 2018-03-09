@@ -5,7 +5,7 @@ extern void coreprocess(char **argv);
 
 int main(int argc, char **argv)
 {
-    openlog("achelous/spring", LOG_PERROR|LOG_PID, LOG_MAIL);
+    openlog("achelous/spring", LOG_PERROR | LOG_PID, LOG_MAIL);
 
     switchuser();
     coreprocess(argv);
