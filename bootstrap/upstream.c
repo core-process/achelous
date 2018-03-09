@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <bsd/libutil.h>
@@ -115,6 +116,26 @@ void cmdstop()
     _exit(0);
 }
 
+void cmdstatus()
+{
+    // read pid
+    int pid = readpid(CONFIG_UPID);
+
+    // print status
+    if(!pid)
+    {
+        syslog(LOG_INFO, "service is stopped");
+        printf("stopped\n");
+    }
+    else
+    {
+        syslog(LOG_INFO, "service is running (pid=%d)", pid);
+        printf("running [%d]\n", pid);
+    }
+    fflush(stdout);
+    _exit(0);
+}
+
 int main(int argc, char **argv)
 {
     if(argc < 2)
@@ -140,6 +161,12 @@ int main(int argc, char **argv)
         if(strcmp(argv[1], "stop") == 0)
         {
             cmdstop();
+        }
+
+        // daemon status (does not return)
+        if(strcmp(argv[1], "status") == 0)
+        {
+            cmdstatus();
         }
     }
 
