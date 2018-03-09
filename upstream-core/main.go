@@ -1,9 +1,13 @@
 package main
 
 import (
-	"os"
+	"fmt"
+	"time"
 )
 
 func main() {
-	os.Exit(0)
+	for true {
+		fmt.Println("... running core ...")
+		time.Sleep(1000 * time.Millisecond)
+	}
 }

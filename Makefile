@@ -44,7 +44,7 @@ $(BIN)/spring: $(SRC)/bootstrap/spring.c $(SRC)/bootstrap/switchuser.c $(SRC)/bo
 	gcc $(filter %.c,$^) -o $@
 
 $(BIN)/upstream: $(SRC)/bootstrap/upstream.c $(SRC)/bootstrap/switchuser.c $(SRC)/bootstrap/coreprocess.c $(SRC)/bootstrap/daemonise.c $(SRC)/bootstrap/config.h | $(BIN)
-	gcc $(filter %.c,$^) -o $@
+	gcc $(filter %.c,$^) -lbsd -o $@
 
 $(SRC)/bootstrap/config.h: $(SRC)/bootstrap/config.h.tpl $(wildcard settings*.mk)
 	envsubst < $< > $@
