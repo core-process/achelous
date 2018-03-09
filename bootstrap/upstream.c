@@ -72,14 +72,9 @@ void cmdstart(int daemon, char **argv)
     }
 
     // wait for core process to end
-    if(daemon != 0)
-    {
-        signal(SIGINT, SIG_CORE);
-    }
-    else
-    {
-        signal(SIGINT, SIG_IGN);
-    }
+    signal(SIGINT, daemon != 0 ? SIG_CORE : SIG_IGN);
+    signal(SIGTERM, daemon != 0 ? SIG_CORE : SIG_IGN);
+    signal(SIGQUIT, daemon != 0 ? SIG_CORE : SIG_IGN);
 
     if(waitpid(corepid, NULL, 0) == -1)
     {
@@ -110,7 +105,7 @@ void cmdstop()
     }
 
     // kill process
-    if(kill(pid, SIGINT) == -1)
+    if(kill(pid, SIGTERM) == -1)
     {
         syslog(LOG_ERR, "failed to kill pid %d (errno=%d)", pid, errno);
         _exit(1);
