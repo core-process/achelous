@@ -6,7 +6,7 @@ extern void coreprocess(char** argv);
 
 int main(int argc, char** argv)
 {
-    openlog("achelous-upstream", LOG_PID, LOG_MAIL);
+    openlog("achelous/upstream", LOG_PID, LOG_MAIL);
 
     daemonise();
     switchuser();
