@@ -1,11 +1,15 @@
 package main
 
 import (
+	"io"
 	"log"
 	"log/syslog"
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
+
+	"github.com/core-process/achelous/upstream-core/processor"
 )
 
 func main() {
@@ -15,49 +19,34 @@ func main() {
 		log.Println(err)
 		return
 	}
-	log.SetOutput(logwriter)
+	log.SetOutput(io.MultiWriter(logwriter, os.Stderr))
 
 	// create signal channel
-	signal_chan := make(chan os.Signal, 1)
-	signal.Notify(signal_chan,
-		syscall.SIGHUP,
+	csig := make(chan os.Signal, 1)
+	signal.Notify(
+		csig,
 		syscall.SIGINT,
 		syscall.SIGTERM,
-		syscall.SIGQUIT)
+		syscall.SIGQUIT,
+	)
 
-	// create exit channel and listen to signal channel
-	exit_chan := make(chan int)
+	cexit := make(chan bool, 1)
 	go func() {
-		for {
-			s := <-signal_chan
-			switch s {
-			// kill -SIGHUP XXXX
-			case syscall.SIGHUP:
-				log.Println("SIGHUP")
-
-			// kill -SIGINT XXXX or Ctrl+c
-			case syscall.SIGINT:
-				log.Println("SIGINT")
-				exit_chan <- 0
-
-			// kill -SIGTERM XXXX
-			case syscall.SIGTERM:
-				log.Println("SIGTERM")
-				exit_chan <- 0
-
-			// kill -SIGQUIT XXXX
-			case syscall.SIGQUIT:
-				log.Println("SIGQUIT")
-				exit_chan <- 0
-
-			default:
-				log.Println("UNKNOWN")
-				exit_chan <- 1
-			}
-		}
+		sig := <-csig
+		log.Println("exiting... (" + sig.String() + ")")
+		cexit <- true
 	}()
 
-	// listen to exit channel
-	code := <-exit_chan
-	os.Exit(code)
+	// main loop
+	for true {
+		select {
+		case <-cexit:
+			log.Println("core completed")
+			os.Exit(0)
+		case <-time.After(5 * time.Second):
+			processor.Run(cexit)
+		}
+	}
+
+	// TODO: fix cancellation case in processor (we still need to terminate main loop then)
 }
