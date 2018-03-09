@@ -12,6 +12,15 @@
 extern void switchuser();
 extern void daemonise();
 extern void coreprocess(char **argv);
+extern int readpid (char *pidfile);
+
+pid_t corepid = -1;
+
+void signal2core(int signum)
+{
+    syslog(LOG_INFO, "forwarding signal to core (signum=%d)", signum);
+    kill(corepid, signum);
+}
 
 void cmdstart(int daemon, char **argv)
 {
@@ -37,15 +46,15 @@ void cmdstart(int daemon, char **argv)
     }
 
     // create child for core process
-    pid_t pid = fork();
+    corepid = fork();
 
-    if (pid == -1)
+    if (corepid == -1)
     {
         syslog(LOG_ERR, "failed to fork for core process (errno=%d)", errno);
         _exit(1);
     }
 
-    if(pid == 0)
+    if(corepid == 0)
     {
         // close pid file in core process
         if(pidfile_close(pfh) == -1)
@@ -64,7 +73,9 @@ void cmdstart(int daemon, char **argv)
     }
 
     // wait for core process to end
-    if(waitpid(pid, NULL, 0) == -1)
+    signal(SIGINT, signal2core);
+
+    if(waitpid(corepid, NULL, 0) == -1)
     {
         syslog(LOG_ERR, "failed to wait for core process (errno=%d)", errno);
         _exit(1);
@@ -83,6 +94,24 @@ void cmdstart(int daemon, char **argv)
 
 void cmdstop()
 {
+    // read pid
+    int pid = readpid(CONFIG_UPID);
+
+    if(!pid)
+    {
+        syslog(LOG_ERR, "failed to read pid from file");
+        _exit(1);
+    }
+
+    // kill process
+    if(kill(pid, SIGINT) == -1)
+    {
+        syslog(LOG_ERR, "failed to kill pid %d (errno=%d)", pid, errno);
+        _exit(1);
+    }
+
+    syslog(LOG_INFO, "send kill signal successfuly");
+    _exit(0);
 }
 
 int main(int argc, char **argv)
