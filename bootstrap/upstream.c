@@ -18,7 +18,7 @@ pid_t corepid = -1;
 
 void signal2core(int signum)
 {
-    syslog(LOG_INFO, "forwarding signal to core (signum=%d)", signum);
+    syslog(LOG_INFO, "propagating signal %d to core process", signum);
     kill(corepid, signum);
 }
 
@@ -64,11 +64,10 @@ void cmdstart(int daemon, char **argv)
         }
 
         // switch to mailing user
-        syslog(LOG_INFO, "switching to mailing user");
         switchuser();
 
         // execute core process (does not return)
-        syslog(LOG_INFO, "starting core process");
+        syslog(LOG_INFO, "executing core process");
         coreprocess(argv);
     }
 
@@ -88,7 +87,7 @@ void cmdstart(int daemon, char **argv)
         _exit(1);
     }
 
-    syslog(LOG_INFO, "completed successfuly");
+    syslog(LOG_INFO, "service completed");
     _exit(0);
 }
 
@@ -110,7 +109,7 @@ void cmdstop()
         _exit(1);
     }
 
-    syslog(LOG_INFO, "send kill signal successfuly");
+    syslog(LOG_INFO, "sent kill signal to service");
     _exit(0);
 }
 
