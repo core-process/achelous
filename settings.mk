@@ -10,3 +10,4 @@ GCC   = gcc
 export CONFIG_USER  = achelous
 export CONFIG_GROUP = achelous
 export CONFIG_SPOOL = /var/spool/achelous
+export CONFIG_UPID  = /var/run/achelous-upstream.pid
