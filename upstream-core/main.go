@@ -41,12 +41,13 @@ func main() {
 	}()
 
 	// main loop
+	processor.Run(ctx)
 	for true {
 		select {
 		case <-ctx.Done():
 			log.Println("core completed")
 			os.Exit(0)
-		case <-time.After(5 * time.Second):
+		case <-time.After(15 * time.Second):
 			processor.Run(ctx)
 		}
 	}
