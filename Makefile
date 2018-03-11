@@ -98,4 +98,5 @@ clean:
 	rm -f bootstrap/config.h
 	rm -f common/config/config.go
 	rm -rf vendor
+	rm -rf testing/testservice/node_modules
 	rm -f testing/*.log
