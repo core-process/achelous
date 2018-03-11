@@ -44,7 +44,7 @@ func main() {
 	cancelled := false
 
 	for !cancelled {
-		// load config
+		// load config (reload on every run to ensure most up-to-date config)
 		cdata, err := config.Load()
 		if err != nil {
 			log.Printf("failed to load upstream config: %v", err)

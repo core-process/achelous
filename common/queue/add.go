@@ -11,7 +11,7 @@ import (
 	"github.com/oklog/ulid"
 )
 
-func Add(queue QueueRef, envelope *enmime.Envelope) error {
+func Add(queue QueueRef, envelope *enmime.Envelope, prettyJSON bool) error {
 
 	// ensure existence of queue directory
 	err := os.MkdirAll(
@@ -129,7 +129,9 @@ func Add(queue QueueRef, envelope *enmime.Envelope) error {
 	defer file.Close()
 
 	encoder := json.NewEncoder(file)
-	encoder.SetIndent("", "  ")
+	if prettyJSON {
+		encoder.SetIndent("", "  ")
+	}
 	encoder.SetEscapeHTML(false)
 
 	if err = encoder.Encode(msg); err != nil {

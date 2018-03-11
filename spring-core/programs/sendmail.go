@@ -9,11 +9,12 @@ import (
 
 	"github.com/core-process/achelous/common/queue"
 	"github.com/core-process/achelous/spring-core/args"
+	"github.com/core-process/achelous/spring-core/config"
 
 	"github.com/jhillyerd/enmime"
 )
 
-func Sendmail(smArgs *args.SmArgs, recipients []string) error {
+func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) error {
 
 	// filter stdin and stop at single-dot-line
 	ignoreDot := smArgs.Arg_i || smArgs.Arg_oi || smArgs.Arg_O.Opt_IgnoreDots
@@ -97,7 +98,11 @@ func Sendmail(smArgs *args.SmArgs, recipients []string) error {
 	}
 
 	// add to queue
-	err = queue.Add(queue.QueueRefRoot, envelope)
+	err = queue.Add(
+		queue.QueueRef(cdata.DefaultQueue),
+		envelope,
+		cdata.PrettyJSON,
+	)
 	if err != nil {
 		return err
 	}

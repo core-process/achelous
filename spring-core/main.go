@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/core-process/achelous/spring-core/args"
+	"github.com/core-process/achelous/spring-core/config"
 	"github.com/core-process/achelous/spring-core/programs"
 )
 
@@ -19,6 +20,12 @@ func main() {
 	}
 	log.SetOutput(io.MultiWriter(logwriter, os.Stderr))
 
+	// load config
+	cdata, err := config.Load()
+	if err != nil {
+		log.Printf("failed to load spring config: %v", err)
+	}
+
 	// parse arguments
 	program, smArgs, mqArgs, values, err := args.Parse(os.Args)
 	if err != nil {
@@ -29,7 +36,7 @@ func main() {
 	// run sub programs
 	switch program {
 	case args.ArgProgramSendmail:
-		err = programs.Sendmail(smArgs, values)
+		err = programs.Sendmail(cdata, smArgs, values)
 	case args.ArgProgramMailq:
 		err = programs.Mailq(mqArgs)
 	}
