@@ -27,7 +27,7 @@ func Run(cdata *config.Config, ctx context.Context) {
 	}
 
 	// only true if everything went fine
-	allOk := true
+	OK := true
 
 	// list of queues to be processes
 	queues := list.New()
@@ -50,16 +50,16 @@ func Run(cdata *config.Config, ctx context.Context) {
 			err := upload(cdata, queueRef, msgID)
 			// handle errors
 			if err != nil {
-				log.Printf("upload of message %s in queue /%s failed: %v", job[1], job[0], err)
-				allOk = false
+				log.Printf("upload of message %s in queue /%s failed: %v", msgID, queueRef, err)
+				OK = false
 				continue
 			}
 			// remove queue entry
-			log.Printf("upload of message %s in queue /%s succeeded", job[1], job[0])
+			log.Printf("upload of message %s in queue /%s succeeded", msgID, queueRef)
 			err = commonQueue.Remove(queueRef, msgID)
 			if err != nil {
-				log.Printf("could not remove message %s in queue /%s: %v", job[1], job[0], err)
-				allOk = false
+				log.Printf("could not remove message %s in queue /%s: %v", msgID, queueRef, err)
+				OK = false
 			}
 		}
 	}()
@@ -73,7 +73,7 @@ func Run(cdata *config.Config, ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			log.Printf("cancelling current queue walk")
-			allOk = false
+			OK = false
 			break
 		default:
 			// noop <=> non-blocking
@@ -86,7 +86,7 @@ func Run(cdata *config.Config, ctx context.Context) {
 		dir, err := os.Open(path.Join(commonConfig.Spool, queue))
 		if err != nil {
 			log.Printf("could not open queue /%s: %v", queue, err)
-			allOk = false
+			OK = false
 			continue
 		}
 		defer dir.Close()
@@ -95,7 +95,7 @@ func Run(cdata *config.Config, ctx context.Context) {
 		entries, err := dir.Readdirnames(-1)
 		if err != nil {
 			log.Printf("could not read entries from queue /%s: %v", queue, err)
-			allOk = false
+			OK = false
 			continue
 		}
 
@@ -104,8 +104,8 @@ func Run(cdata *config.Config, ctx context.Context) {
 			// check if we have to exit early
 			select {
 			case <-ctx.Done():
-				log.Printf("cancelling current queue walk")
-				allOk = false
+				log.Printf("cancelling current entry iteration")
+				OK = false
 				break
 			default:
 				// noop <=> non-blocking
@@ -115,11 +115,11 @@ func Run(cdata *config.Config, ctx context.Context) {
 			stat, err := os.Stat(path.Join(commonConfig.Spool, queue, entry))
 			if err != nil {
 				log.Printf("could not retrieve file info for entry %s in queue /%s: %v", entry, queue, err)
+				// in case the error occured while stat'ing a potentially item in preparing
+				// state, we will not include this as an invalid operation. this might happen
+				// due to race conditions, which are happening by design in this case.
 				if !strings.HasSuffix(entry, pext) {
-					// in case the error occured while stat'ing a potentially item in preparing
-					// state, we will not include this as an invalid operation. this might happen
-					// due to race conditions, which are happening by design in this case.
-					allOk = false
+					OK = false
 				}
 				continue
 			}
@@ -144,10 +144,10 @@ func Run(cdata *config.Config, ctx context.Context) {
 	wg.Wait()
 
 	// do not report success in case something did not work fine
-	err := report(allOk)
+	err := report(cdata, OK)
 	if err != nil {
 		log.Printf("could not report status: %v", err)
 	}
 
-	log.Printf("queue processing completed (allOk=%v)", allOk)
+	log.Printf("queue processing completed (OK=%v)", OK)
 }
