@@ -9,5 +9,5 @@
 
 /settings.user.mk
 
-/.vagrant
-/*.log
+/testing/.vagrant
+/testing/*.log

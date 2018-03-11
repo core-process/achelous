@@ -95,4 +95,4 @@ clean:
 	rm -f bootstrap/config.h
 	rm -f common/config/config.go
 	rm -rf vendor
-	rm -f *.log
+	rm -f testing/*.log
