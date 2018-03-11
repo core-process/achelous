@@ -36,21 +36,17 @@ struct pidfh* daemonise(const char* pidpath)
     }
     else if (pid != 0)
     {
-        // wait 5 sec for pid file to be written
-        struct timespec tenthsec;
-        tenthsec.tv_sec = 0;
-        tenthsec.tv_nsec = 100000000;
-
-        for(time_t ts = time(NULL); (time(NULL) - ts) <= 5;)
+        // wait 10 sec for pid file to be written
+        for(time_t ts = time(NULL); (time(NULL) - ts) <= 10;)
         {
+            sleep(1);
+
             int observed_pid = readpid(pidpath);
             if(observed_pid != 0)
             {
                 syslog(LOG_ERR, "observed pid: %d", observed_pid);
                 goto branch_exit_grace;
             }
-
-            nanosleep(&tenthsec, 0);
         }
 
         // fail, since we did not observe pid to be written

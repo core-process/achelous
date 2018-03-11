@@ -1,10 +1,11 @@
 [Unit]
-Description=Achelous Upstream Service
+Description=Achelous Upstream
 
 [Service]
 Type=forking
 ExecStart=/usr/sbin/achelous-upstream start
 ExecStop=/usr/sbin/achelous-upstream stop
+PIDFile=/var/run/achelous-upstream.pid
 
 [Install]
 WantedBy=multi-user.target

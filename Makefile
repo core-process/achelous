@@ -65,6 +65,7 @@ $(DEB): CONTENT = .build/dist/content
 $(DEB): $(BINARIES) meta/deb/*
 	# create directories
 	mkdir -p $(CONTENT)/DEBIAN
+	mkdir -p $(CONTENT)/lib/systemd/system/
 	mkdir -p $(CONTENT)/usr/sbin
 	mkdir -p $(CONTENT)/usr/share/doc/achelous
 	chmod -R 755 $(CONTENT)
@@ -74,6 +75,8 @@ $(DEB): $(BINARIES) meta/deb/*
 	gzip --best -n < meta/deb/changelog > $(CONTENT)/usr/share/doc/achelous/changelog.Debian.gz
 	cp meta/deb/copyright $(CONTENT)/usr/share/doc/achelous/
 	chmod 644 $(CONTENT)/usr/share/doc/achelous/*
+	cp meta/achelous-upstream.service $(CONTENT)/lib/systemd/system/
+	chmod 644 $(CONTENT)/lib/systemd/system/*
 	# assemble content
 	for bin in $(BINARIES); do \
 		cp "$$bin" "$(CONTENT)/usr/sbin/achelous-$$(basename $$bin)"; \

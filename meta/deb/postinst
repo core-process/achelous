@@ -17,12 +17,9 @@ case "$1" in
             chmod 750 /var/spool/achelous
         fi
 
-        # create log dir
-        if [ ! -d /var/log/achelous ]; then
-            mkdir -p /var/log/achelous
-            chown achelous:achelous /var/log/achelous
-            chmod 750 /var/log/achelous
-        fi
+        # enable service
+        deb-systemd-helper enable achelous-upstream.service
+        deb-systemd-invoke restart achelous-upstream.service
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

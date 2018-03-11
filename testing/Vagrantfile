@@ -15,6 +15,7 @@ Vagrant.configure("2") do |config|
     achelous.vm.provision "file", source: "../.build/dist/achelous_1.0-1_amd64.deb", destination: "achelous_1.0-1_amd64.deb"
     achelous.vm.provision "shell", inline: <<-SHELL
       apt-get -qq update
+      apt-get -qq dist-upgrade
       dpkg -i achelous_1.0-1_amd64.deb
       apt-get -y -qq install mailutils
     SHELL
@@ -24,6 +25,23 @@ Vagrant.configure("2") do |config|
     testservice.vm.box = "ubuntu/xenial64"
     testservice.vm.hostname = 'testservice'
     testservice.vm.network :private_network, ip: "192.168.56.102"
+    testservice.vm.provision "shell", inline: <<-SHELL
+      apt-get -qq update
+      apt-get -qq dist-upgrade
+      curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
+      sudo apt-get -y -qq install nodejs
+      adduser testservice
+    SHELL
+    testservice.vm.provision "file", source: "./testservice/main.js", destination: "/home/testservice/main.js"
+    testservice.vm.provision "file", source: "./testservice/package.json", destination: "/home/testservice/package.json"
+    testservice.vm.provision "shell", inline: <<-SHELL
+      su -l -c testservice 'npm install'
+    SHELL
+    testservice.vm.provision "file", source: "./testservice/achelous-testservice.service", destination: "/lib/systemd/system/achelous-testservice.service"
+    testservice.vm.provision "shell", inline: <<-SHELL
+      systemctl enable achelous-testservice.service
+      systemctl start achelous-testservice.service
+    SHELL
   end
 
 end

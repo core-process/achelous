@@ -1,0 +1,11 @@
+[Unit]
+Description=Achelous Test
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/node /home/testservice/main.js
+User=testservice
+Group=testservice
+
+[Install]
+WantedBy=multi-user.target
