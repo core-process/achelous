@@ -1,0 +1,14 @@
+{
+  "name": "testservice",
+  "version": "1.0.0",
+  "description": "Achelous Testservice",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Niklas Salmoukas <niklas@salmoukas.com>",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2"
+  }
+}

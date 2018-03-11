@@ -9,5 +9,6 @@
 
 /settings.user.mk
 
+/testing/testservice/node_modules
 /testing/.vagrant
 /testing/*.log
