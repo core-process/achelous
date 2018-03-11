@@ -26,7 +26,7 @@ void SIG_CORE(int signum)
 void cmdstart(int daemon, char **argv)
 {
     // create lock file
-    struct pidfh *pfh = pidfile_open(CONFIG_UPID, 0600, NULL);
+    struct pidfh *pfh = pidfile_open(CONFIG_UPSTREAM_PID, 0600, NULL);
     if (pfh == NULL)
     {
         syslog(LOG_ERR, "failed to lock pidfile (errno=%d)", errno);
@@ -97,7 +97,7 @@ void cmdstart(int daemon, char **argv)
 void cmdstop()
 {
     // read pid
-    int pid = readpid(CONFIG_UPID);
+    int pid = readpid(CONFIG_UPSTREAM_PID);
 
     if(!pid)
     {
@@ -119,7 +119,7 @@ void cmdstop()
 void cmdstatus()
 {
     // read pid
-    int pid = readpid(CONFIG_UPID);
+    int pid = readpid(CONFIG_UPSTREAM_PID);
 
     // print status
     if(!pid)

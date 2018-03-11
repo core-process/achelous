@@ -9,8 +9,9 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/core-process/achelous/common/config"
+	commonConfig "github.com/core-process/achelous/common/config"
 	commonQueue "github.com/core-process/achelous/common/queue"
+	config "github.com/core-process/achelous/upstream-core/config"
 
 	"github.com/oklog/ulid"
 )
@@ -18,6 +19,18 @@ import (
 func Run(ctx context.Context) {
 
 	log.Printf("queue processing started")
+
+	// load config (bail out on error)
+	cdata, err := config.Load()
+	if err != nil {
+		log.Printf("failed to load upstream config, aborting: %v", err)
+		return
+	}
+
+	if cdata.Target.Upload.URL == nil {
+		log.Printf("no upload target url configured, aborting")
+		return
+	}
 
 	// only true if everything went fine
 	allOk := true
@@ -40,7 +53,7 @@ func Run(ctx context.Context) {
 			queueRef := commonQueue.QueueRef(job[0])
 			msgID := ulid.MustParse(job[1])
 			// run upload
-			err := upload(queueRef, msgID)
+			err := upload(cdata, queueRef, msgID)
 			// handle errors
 			if err != nil {
 				log.Printf("upload of message %s in queue /%s failed: %v", job[1], job[0], err)
@@ -76,7 +89,7 @@ func Run(ctx context.Context) {
 		queue := queues.Remove(queues.Front()).(string)
 
 		// open directory
-		dir, err := os.Open(path.Join(config.Spool, queue))
+		dir, err := os.Open(path.Join(commonConfig.Spool, queue))
 		if err != nil {
 			log.Printf("could not open queue /%s: %v", queue, err)
 			allOk = false
@@ -105,7 +118,7 @@ func Run(ctx context.Context) {
 			}
 
 			// get file info
-			stat, err := os.Stat(path.Join(config.Spool, queue, entry))
+			stat, err := os.Stat(path.Join(commonConfig.Spool, queue, entry))
 			if err != nil {
 				log.Printf("could not retrieve file info for entry %s in queue /%s: %v", entry, queue, err)
 				if !strings.HasSuffix(entry, pext) {
@@ -137,7 +150,7 @@ func Run(ctx context.Context) {
 	wg.Wait()
 
 	// do not report success in case something did not work fine
-	err := report(allOk)
+	err = report(allOk)
 	if err != nil {
 		log.Printf("could not report status: %v", err)
 	}

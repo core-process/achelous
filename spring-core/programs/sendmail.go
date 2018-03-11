@@ -97,7 +97,7 @@ func Sendmail(smArgs *args.SmArgs, recipients []string) error {
 	}
 
 	// add to queue
-	err = queue.AddToQueue(queue.QueueRefRoot, envelope)
+	err = queue.Add(queue.QueueRefRoot, envelope)
 	if err != nil {
 		return err
 	}

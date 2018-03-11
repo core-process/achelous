@@ -11,7 +11,7 @@ import (
 	"github.com/oklog/ulid"
 )
 
-func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
+func Add(queue QueueRef, envelope *enmime.Envelope) error {
 
 	// ensure existence of queue directory
 	err := os.MkdirAll(
@@ -102,7 +102,7 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 		msg.Attachments = append(
 			msg.Attachments,
 			Attachment{
-				Id:      attachment.ContentID,
+				ID:      attachment.ContentID,
 				Type:    attachment.ContentType,
 				Charset: attachment.Charset,
 				Name:    attachment.FileName,
@@ -116,6 +116,8 @@ func AddToQueue(queue QueueRef, envelope *enmime.Envelope) error {
 	if err != nil {
 		return err
 	}
+
+	msg.ID = id
 
 	// write message data
 	pathPreparing := MessagePath(queue, id, MessageStatusPreparing)

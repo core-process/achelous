@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/core-process/achelous/upstream-core/config"
 	"github.com/core-process/achelous/upstream-core/processor"
 )
 
@@ -42,13 +43,19 @@ func main() {
 
 	// main loop
 	processor.Run(ctx)
+
 	for true {
+		// load config (ignore errors in this case)
+		cdata, _ := config.Load()
+		// select on timeout and signal
 		select {
 		case <-ctx.Done():
-			log.Println("core completed")
-			os.Exit(0)
-		case <-time.After(15 * time.Second):
+			break
+		case <-time.After(cdata.PauseBetweenRuns):
 			processor.Run(ctx)
 		}
 	}
+
+	log.Println("core completed")
+	os.Exit(0)
 }

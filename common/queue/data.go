@@ -1,6 +1,10 @@
 package queue
 
-import "time"
+import (
+	"time"
+
+	"github.com/oklog/ulid"
+)
 
 type QueueRef string
 
@@ -21,7 +25,7 @@ type Participant struct {
 }
 
 type Attachment struct {
-	Id      string `json:"id"`
+	ID      string `json:"id"`
 	Type    string `json:"type"`
 	Charset string `json:"charset"`
 	Name    string `json:"name"`
@@ -29,6 +33,7 @@ type Attachment struct {
 }
 
 type Message struct {
+	ID           ulid.ULID `json:"id"`
 	Timestamp    time.Time `json:"timestamp"`
 	Participants struct {
 		From *Participant  `json:"from"`
