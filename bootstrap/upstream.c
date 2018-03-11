@@ -11,9 +11,9 @@
 #include "config.h"
 
 extern void switchuser();
-extern struct pidfh* daemonise();
+extern struct pidfh* daemonise(const char* pidpath);
 extern void coreprocess(char **argv);
-extern int readpid(char *pidfile);
+extern int readpid(const char *pidfile);
 
 pid_t corepid = -1;
 
@@ -29,7 +29,7 @@ void SIG_CORE(int signum)
 void cmdstart(char **argv)
 {
     // become a daemon (returns on daemonized process)
-    struct pidfh *pfh = daemonise();
+    struct pidfh *pfh = daemonise(CONFIG_UPSTREAM_PID);
 
     // fork controlling and core process
     pid_t pid = fork();
@@ -46,9 +46,10 @@ void cmdstart(char **argv)
         // write pid
         if (pidfile_write(pfh) == -1)
         {
-            syslog(LOG_ERR, "failed to write pid to pidfile (errno=%d)", errno);
+            syslog(LOG_ERR, "failed to write pid to pid file (errno=%d)", errno);
             goto exit_fail;
         }
+        syslog(LOG_INFO, "pid file written");
 
         // wait for core process to end
         signal(SIGINT, SIG_CORE);
@@ -75,6 +76,7 @@ void cmdstart(char **argv)
     // execute core process (does not return)
     syslog(LOG_INFO, "executing core process");
     coreprocess(argv);
+    return;
 
     ////////////////////////////////////////////////////////
     // EXIT HANDLING (controlling process)
@@ -84,6 +86,7 @@ exit_fail:
     if(pfh != NULL)
     {
         pidfile_remove(pfh);
+        syslog(LOG_INFO, "pid file removed");
     }
     _exit(1);
 
@@ -91,6 +94,7 @@ exit_grace:
     if(pfh != NULL)
     {
         pidfile_remove(pfh);
+        syslog(LOG_INFO, "pid file removed");
     }
     _exit(0);
 }

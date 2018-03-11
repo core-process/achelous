@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-int readpid (char *pidfile)
+int readpid (const char *pidfile)
 {
     FILE *f;
     int pid = 0;

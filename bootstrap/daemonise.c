@@ -5,7 +5,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <time.h>
 #include <bsd/libutil.h>
+
+extern int readpid(const char *pidfile);
 
 struct pidfh* daemonise(const char* pidpath)
 {
@@ -13,8 +16,8 @@ struct pidfh* daemonise(const char* pidpath)
     struct pidfh* pfh = pidfile_open(pidpath, 0600, NULL);
     if (pfh == NULL)
     {
-        syslog(LOG_ERR, "failed to lock pidfile (errno=%d)", errno);
-        goto exit_fail;
+        syslog(LOG_ERR, "failed to lock pid file (errno=%d)", errno);
+        goto main_exit_fail;
     }
 
     // The first call to fork(2) ensures that the process is
@@ -29,18 +32,37 @@ struct pidfh* daemonise(const char* pidpath)
     if (pid == -1)
     {
         syslog(LOG_ERR, "failed to fork while daemonising (errno=%d)", errno);
-        goto exit_fail;
+        goto main_exit_fail;
     }
     else if (pid != 0)
     {
-        goto exit_grace;
+        // wait 5 sec for pid file to be written
+        struct timespec tenthsec;
+        tenthsec.tv_sec = 0;
+        tenthsec.tv_nsec = 100000000;
+
+        for(time_t ts = time(NULL); (time(NULL) - ts) <= 5;)
+        {
+            int observed_pid = readpid(pidpath);
+            if(observed_pid != 0)
+            {
+                syslog(LOG_ERR, "observed pid: %d", observed_pid);
+                goto branch_exit_grace;
+            }
+
+            nanosleep(&tenthsec, 0);
+        }
+
+        // fail, since we did not observe pid to be written
+        syslog(LOG_ERR, "failed to observe pid");
+        goto branch_exit_fail;
     }
 
     // Start a new session for the daemon.
     if (setsid() == -1)
     {
         syslog(LOG_ERR, "failed to become a session leader while daemonising (errno=%d)", errno);
-        goto exit_fail;
+        goto main_exit_fail;
     }
 
     // The second fork(2) is there to ensure that the new
@@ -54,18 +76,18 @@ struct pidfh* daemonise(const char* pidpath)
     if (pid == -1)
     {
         syslog(LOG_ERR, "failed to fork while daemonising (errno=%d)", errno);
-        goto exit_fail;
+        goto main_exit_fail;
     }
     else if (pid != 0)
     {
-        goto exit_grace;
+        goto branch_exit_grace;
     }
 
     // Set the current working directory to the root directory.
     if (chdir("/") == -1)
     {
         syslog(LOG_ERR, "failed to change working directory while daemonising (errno=%d)", errno);
-        goto exit_fail;
+        goto main_exit_fail;
     }
 
     // Set the user file creation mask to zero.
@@ -77,7 +99,7 @@ struct pidfh* daemonise(const char* pidpath)
     if ((fd = open("/dev/null", O_RDONLY)) == -1)
     {
         syslog(LOG_ERR, "failed to reopen stdin while daemonising (errno=%d)", errno);
-        goto exit_fail;
+        goto main_exit_fail;
     }
 
     dup2(fd, 0);
@@ -86,7 +108,7 @@ struct pidfh* daemonise(const char* pidpath)
     if ((fd = open("/dev/null", O_WRONLY)) == -1)
     {
         syslog(LOG_ERR, "failed to reopen stdout while daemonising (errno=%d)", errno);
-        goto exit_fail;
+        goto main_exit_fail;
     }
 
     dup2(fd, 1);
@@ -95,7 +117,7 @@ struct pidfh* daemonise(const char* pidpath)
     if ((fd = open("/dev/null", O_WRONLY)) == -1)
     {
         syslog(LOG_ERR, "failed to reopen stderr while daemonising (errno=%d)", errno);
-        goto exit_fail;
+        goto main_exit_fail;
     }
 
     dup2(fd, 2);
@@ -108,14 +130,22 @@ struct pidfh* daemonise(const char* pidpath)
     // EXIT HANDLING
     ////////////////////////////////////////////////////////
 
-exit_fail:
+main_exit_fail:
     if(pfh != NULL)
     {
         pidfile_remove(pfh);
+        syslog(LOG_INFO, "pid file removed");
     }
     _exit(1);
 
-exit_grace:
+branch_exit_fail:
+    if(pfh != NULL)
+    {
+        pidfile_close(pfh);
+    }
+    _exit(1);
+
+branch_exit_grace:
     if(pfh != NULL)
     {
         pidfile_close(pfh);

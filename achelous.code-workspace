@@ -22,9 +22,6 @@
 		},
 		// Set path to required Go tools
 		// Note: add ~/.gotools/bin to your PATH and restart VSC
-		"go.toolsGopath": "~/.gotools",
-		"files.associations": {
-			"syslog.h": "c"
-		}
+		"go.toolsGopath": "~/.gotools"
 	}
 }
