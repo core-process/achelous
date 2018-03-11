@@ -15,6 +15,7 @@ import (
 
 func upload(cdata *config.Config, queue commonQueue.QueueRef, id ulid.ULID) error {
 
+	// retry loop
 	var lastError error
 	lastError = nil
 

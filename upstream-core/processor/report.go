@@ -16,6 +16,13 @@ func report(cdata *config.Config, OK bool) error {
 		return nil
 	}
 
+	// check if we have an url available
+	if cdata.Target.Report.URL == nil {
+		log.Printf("no report target url configured, skipping")
+		return nil
+	}
+
+	// retry loop
 	var lastError error
 	lastError = nil
 
