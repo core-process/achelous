@@ -25,20 +25,18 @@ Vagrant.configure("2") do |config|
     testservice.vm.box = "ubuntu/xenial64"
     testservice.vm.hostname = 'testservice'
     testservice.vm.network :private_network, ip: "192.168.56.102"
+    testservice.vm.provision "file", source: "./testservice/main.js", destination: "main.js"
+    testservice.vm.provision "file", source: "./testservice/package.json", destination: "package.json"
+    testservice.vm.provision "file", source: "./testservice/achelous-testservice.service", destination: "achelous-testservice.service"
     testservice.vm.provision "shell", inline: <<-SHELL
       apt-get -qq update
       apt-get -qq dist-upgrade
       curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
       sudo apt-get -y -qq install nodejs
-      adduser testservice
-    SHELL
-    testservice.vm.provision "file", source: "./testservice/main.js", destination: "/home/testservice/main.js"
-    testservice.vm.provision "file", source: "./testservice/package.json", destination: "/home/testservice/package.json"
-    testservice.vm.provision "shell", inline: <<-SHELL
-      su -l -c testservice 'npm install'
-    SHELL
-    testservice.vm.provision "file", source: "./testservice/achelous-testservice.service", destination: "/lib/systemd/system/achelous-testservice.service"
-    testservice.vm.provision "shell", inline: <<-SHELL
+      adduser --disabled-password --gecos "" testservice
+      mv main.js package.json /home/testservice/
+      su -l -c 'npm install' testservice
+      mv achelous-testservice.service /lib/systemd/system/
       systemctl enable achelous-testservice.service
       systemctl start achelous-testservice.service
     SHELL
