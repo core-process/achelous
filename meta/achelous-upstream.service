@@ -1,0 +1,10 @@
+[Unit]
+Description=Achelous Upstream Service
+
+[Service]
+Type=forking
+ExecStart=/usr/sbin/achelous-upstream start
+ExecStop=/usr/sbin/achelous-upstream stop
+
+[Install]
+WantedBy=multi-user.target

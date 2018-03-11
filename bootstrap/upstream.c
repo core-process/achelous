@@ -11,86 +11,87 @@
 #include "config.h"
 
 extern void switchuser();
-extern void daemonise();
+extern struct pidfh* daemonise();
 extern void coreprocess(char **argv);
-extern int readpid (char *pidfile);
+extern int readpid(char *pidfile);
 
 pid_t corepid = -1;
 
 void SIG_CORE(int signum)
 {
     syslog(LOG_INFO, "propagating signal %d to core process", signum);
-    kill(corepid, signum);
+    if(corepid != -1)
+    {
+        kill(corepid, signum);
+    }
 }
 
-void cmdstart(int daemon, char **argv)
+void cmdstart(char **argv)
 {
-    // create lock file
-    struct pidfh *pfh = pidfile_open(CONFIG_UPSTREAM_PID, 0600, NULL);
-    if (pfh == NULL)
-    {
-        syslog(LOG_ERR, "failed to lock pidfile (errno=%d)", errno);
-        _exit(1);
-    }
+    // become a daemon (returns on daemonized process)
+    struct pidfh *pfh = daemonise();
 
-    // become a daemon
-    if(daemon != 0)
-    {
-        daemonise();
-    }
-
-    // write pid
-    if(pidfile_write(pfh) == -1)
-    {
-        syslog(LOG_ERR, "failed to write pid to pidfile (errno=%d)", errno);
-        _exit(1);
-    }
-
-    // create child for core process
-    corepid = fork();
-
-    if (corepid == -1)
+    // fork controlling and core process
+    pid_t pid = fork();
+    if (pid == -1)
     {
         syslog(LOG_ERR, "failed to fork for core process (errno=%d)", errno);
-        _exit(1);
+        goto exit_fail;
     }
-
-    if(corepid == 0)
+    else if (pid != 0)
     {
-        // close pid file in core process
-        if(pidfile_close(pfh) == -1)
+        // remember pid of core process
+        corepid = pid;
+
+        // write pid
+        if (pidfile_write(pfh) == -1)
         {
-            syslog(LOG_ERR, "failed to close pidfile in core process (errno=%d)", errno);
-            _exit(1);
+            syslog(LOG_ERR, "failed to write pid to pidfile (errno=%d)", errno);
+            goto exit_fail;
         }
 
-        // switch to mailing user
-        switchuser();
+        // wait for core process to end
+        signal(SIGINT, SIG_CORE);
+        signal(SIGTERM, SIG_CORE);
+        signal(SIGQUIT, SIG_CORE);
 
-        // execute core process (does not return)
-        syslog(LOG_INFO, "executing core process");
-        coreprocess(argv);
+        if (waitpid(corepid, NULL, 0) == -1)
+        {
+            syslog(LOG_ERR, "failed to wait for core process (errno=%d)", errno);
+            goto exit_fail;
+        }
+
+        // service completed
+        syslog(LOG_INFO, "service completed");
+        goto exit_grace;
     }
 
-    // wait for core process to end
-    signal(SIGINT, daemon != 0 ? SIG_CORE : SIG_IGN);
-    signal(SIGTERM, daemon != 0 ? SIG_CORE : SIG_IGN);
-    signal(SIGQUIT, daemon != 0 ? SIG_CORE : SIG_IGN);
+    // close pid file
+    pidfile_close(pfh);
 
-    if(waitpid(corepid, NULL, 0) == -1)
+    // switch to mailing user
+    switchuser();
+
+    // execute core process (does not return)
+    syslog(LOG_INFO, "executing core process");
+    coreprocess(argv);
+
+    ////////////////////////////////////////////////////////
+    // EXIT HANDLING (controlling process)
+    ////////////////////////////////////////////////////////
+
+exit_fail:
+    if(pfh != NULL)
     {
-        syslog(LOG_ERR, "failed to wait for core process (errno=%d)", errno);
-        _exit(1);
+        pidfile_remove(pfh);
     }
+    _exit(1);
 
-    // remove pid file
-    if(pidfile_remove(pfh) == -1)
+exit_grace:
+    if(pfh != NULL)
     {
-        syslog(LOG_ERR, "failed to remove pidfile (errno=%d)", errno);
-        _exit(1);
+        pidfile_remove(pfh);
     }
-
-    syslog(LOG_INFO, "service completed");
     _exit(0);
 }
 
@@ -99,14 +100,14 @@ void cmdstop()
     // read pid
     int pid = readpid(CONFIG_UPSTREAM_PID);
 
-    if(!pid)
+    if (!pid)
     {
         syslog(LOG_ERR, "failed to read pid from file");
         _exit(1);
     }
 
     // kill process
-    if(kill(pid, SIGTERM) == -1)
+    if (kill(pid, SIGTERM) == -1)
     {
         syslog(LOG_ERR, "failed to kill pid %d (errno=%d)", pid, errno);
         _exit(1);
@@ -122,7 +123,7 @@ void cmdstatus()
     int pid = readpid(CONFIG_UPSTREAM_PID);
 
     // print status
-    if(!pid)
+    if (!pid)
     {
         syslog(LOG_INFO, "service is stopped");
         printf("stopped\n");
@@ -138,36 +139,25 @@ void cmdstatus()
 
 int main(int argc, char **argv)
 {
-    if(argc < 2)
-    {
-        // setup logging
-        openlog("achelous/upstream", LOG_PERROR | LOG_PID, LOG_MAIL);
+    // setup logging
+    openlog("achelous/upstream", LOG_PID, LOG_MAIL);
 
-        // run in foreground mode (does not return)
-        cmdstart(0, argv);
+    // start daemon (does not return)
+    if (argc < 2 || strcmp(argv[1], "start") == 0)
+    {
+        cmdstart(argv);
     }
-    else
+
+    // stop daemon (does not return)
+    if (strcmp(argv[1], "stop") == 0)
     {
-        // setup logging
-        openlog("achelous/upstream", LOG_PID, LOG_MAIL);
+        cmdstop();
+    }
 
-        // start daemon (does not return)
-        if(strcmp(argv[1], "start") == 0)
-        {
-            cmdstart(1, argv);
-        }
-
-        // stop daemon (does not return)
-        if(strcmp(argv[1], "stop") == 0)
-        {
-            cmdstop();
-        }
-
-        // daemon status (does not return)
-        if(strcmp(argv[1], "status") == 0)
-        {
-            cmdstatus();
-        }
+    // daemon status (does not return)
+    if (strcmp(argv[1], "status") == 0)
+    {
+        cmdstatus();
     }
 
     return 0;

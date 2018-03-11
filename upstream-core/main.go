@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"io"
 	"log"
 	"log/syslog"
 	"os"
@@ -21,7 +20,7 @@ func main() {
 		log.Println(err)
 		return
 	}
-	log.SetOutput(io.MultiWriter(logwriter, os.Stderr))
+	log.SetOutput(logwriter)
 
 	// create signal channel
 	csig := make(chan os.Signal, 1)
