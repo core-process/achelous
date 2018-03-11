@@ -33,7 +33,6 @@ func main() {
 	)
 
 	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
 
 	go func() {
 		sig := <-csig
@@ -42,20 +41,28 @@ func main() {
 	}()
 
 	// main loop
-	processor.Run(ctx)
+	cancelled := false
 
-	for true {
-		// load config (ignore errors in this case)
-		cdata, _ := config.Load()
+	for !cancelled {
+		// load config
+		cdata, err := config.Load()
+		if err != nil {
+			log.Printf("failed to load upstream config: %v", err)
+		}
+
+		// run processor
+		processor.Run(cdata, ctx)
+
 		// select on timeout and signal
 		select {
 		case <-ctx.Done():
-			break
+			cancelled = true
 		case <-time.After(cdata.PauseBetweenRuns):
-			processor.Run(ctx)
+			// noop
 		}
 	}
 
+	// completed
 	log.Println("core completed")
 	os.Exit(0)
 }

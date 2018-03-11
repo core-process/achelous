@@ -16,17 +16,11 @@ import (
 	"github.com/oklog/ulid"
 )
 
-func Run(ctx context.Context) {
+func Run(cdata *config.Config, ctx context.Context) {
 
 	log.Printf("queue processing started")
 
-	// load config (bail out on error)
-	cdata, err := config.Load()
-	if err != nil {
-		log.Printf("failed to load upstream config, aborting: %v", err)
-		return
-	}
-
+	// validate config
 	if cdata.Target.Upload.URL == nil {
 		log.Printf("no upload target url configured, aborting")
 		return
@@ -150,7 +144,7 @@ func Run(ctx context.Context) {
 	wg.Wait()
 
 	// do not report success in case something did not work fine
-	err = report(allOk)
+	err := report(allOk)
 	if err != nil {
 		log.Printf("could not report status: %v", err)
 	}
