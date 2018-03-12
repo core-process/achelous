@@ -61,33 +61,47 @@ func Add(queue QueueRef, envelope *enmime.Envelope, prettyJSON bool) error {
 
 	addresses, err := envelope.AddressList("From")
 	if err != mail.ErrHeaderNotPresent {
-		if err != nil {
+		if err != nil && err.Error() == "mail: no angle-addr" {
+			msg.Participants.From = &Participant{
+				Name:  envelope.GetHeader("From"),
+				Email: "",
+			}
+		} else if err != nil {
 			return err
+		} else {
+			for _, address := range addresses {
+				msg.Participants.From = &Participant{
+					Name:  address.Name,
+					Email: address.Address,
+				}
+				break
+			}
 		}
 
-		for _, address := range addresses {
-			msg.Participants.From = &Participant{
-				Name:  address.Name,
-				Email: address.Address,
-			}
-			break
-		}
 	}
 
 	addresses, err = envelope.AddressList("To")
 	if err != mail.ErrHeaderNotPresent {
-		if err != nil {
-			return err
-		}
-
-		for _, address := range addresses {
+		if err != nil && err.Error() == "mail: no angle-addr" {
 			msg.Participants.To = append(
 				msg.Participants.To,
 				Participant{
-					Name:  address.Name,
-					Email: address.Address,
+					Name:  envelope.GetHeader("To"),
+					Email: "",
 				},
 			)
+		} else if err != nil {
+			return err
+		} else {
+			for _, address := range addresses {
+				msg.Participants.To = append(
+					msg.Participants.To,
+					Participant{
+						Name:  address.Name,
+						Email: address.Address,
+					},
+				)
+			}
 		}
 	}
 
