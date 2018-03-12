@@ -1,4 +1,8 @@
 {
+	"PauseBetweenRuns": {
+		"PreviousRunOK": "2m",
+		"PreviousRunWithErrors": "30s"
+	},
 	"Target": {
 		"Upload": {
 			"URL": "http://192.168.56.102:3000/upload",

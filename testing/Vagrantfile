@@ -19,7 +19,7 @@ Vagrant.configure("2") do |config|
       mv upstream.json /etc/achelous/
       apt-get -qq update
       apt-get -qq dist-upgrade
-      apt-get -y -qq install mc
+      apt-get -y -qq install mc jq
       dpkg -i achelous_1.0-1_amd64.deb
       apt-get -y -qq install mailutils
     SHELL
@@ -35,7 +35,7 @@ Vagrant.configure("2") do |config|
     testservice.vm.provision "shell", inline: <<-SHELL
       apt-get -qq update
       apt-get -qq dist-upgrade
-      apt-get -y -qq install mc
+      apt-get -y -qq install mc jq
       curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
       sudo apt-get -y -qq install nodejs
       adduser --disabled-password --gecos "" testservice
