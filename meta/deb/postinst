@@ -17,9 +17,9 @@ case "$1" in
             chmod 750 /var/spool/achelous
         fi
 
-        # enable service
-        deb-systemd-helper enable achelous-upstream.service
-        deb-systemd-invoke restart achelous-upstream.service
+        # enable systemd service
+        deb-systemd-helper enable achelous-upstream.service || true
+        deb-systemd-invoke restart achelous-upstream.service || true
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
