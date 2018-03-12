@@ -50,13 +50,18 @@ func main() {
 		}
 
 		// run processor
-		processor.Run(cdata, ctx)
+		runOK := processor.Run(cdata, ctx)
 
 		// select on timeout and signal
+		pauseBetweenRuns := cdata.PauseBetweenRuns.PreviousRunWithErrors.Duration
+		if runOK {
+			pauseBetweenRuns = cdata.PauseBetweenRuns.PreviousRunOK.Duration
+		}
+
 		select {
 		case <-ctx.Done():
 			cancelled = true
-		case <-time.After(cdata.PauseBetweenRuns.Duration):
+		case <-time.After(pauseBetweenRuns):
 			// noop
 		}
 	}

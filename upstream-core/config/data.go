@@ -5,8 +5,11 @@ import (
 )
 
 type Config struct {
-	PauseBetweenRuns jsonutil.Duration
-	Target           struct {
+	PauseBetweenRuns struct {
+		PreviousRunOK         jsonutil.Duration
+		PreviousRunWithErrors jsonutil.Duration
+	}
+	Target struct {
 		Upload struct {
 			URL    *string
 			Header map[string][]string
@@ -15,9 +18,9 @@ type Config struct {
 			URL    *string
 			Header map[string][]string
 		}
-		RetryPerRun struct {
-			Attempts int
-			Pause    jsonutil.Duration
+		RetriesPerRun struct {
+			Attempts             int
+			PauseBetweenAttempts jsonutil.Duration
 		}
 	}
 }

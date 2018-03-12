@@ -16,14 +16,14 @@ import (
 	"github.com/oklog/ulid"
 )
 
-func Run(cdata *config.Config, ctx context.Context) {
+func Run(cdata *config.Config, ctx context.Context) bool {
 
 	log.Printf("queue processing started")
 
 	// validate config
 	if cdata.Target.Upload.URL == nil {
 		log.Printf("no upload target url configured, aborting")
-		return
+		return false
 	}
 
 	// only true if everything went fine
@@ -150,4 +150,5 @@ func Run(cdata *config.Config, ctx context.Context) {
 	}
 
 	log.Printf("queue processing completed (OK=%v)", OK)
+	return OK
 }

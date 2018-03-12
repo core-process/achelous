@@ -26,10 +26,10 @@ func report(cdata *config.Config, OK bool) error {
 	var lastError error
 	lastError = nil
 
-	for i := 0; i < cdata.Target.RetryPerRun.Attempts; i++ {
+	for i := 0; i < cdata.Target.RetriesPerRun.Attempts; i++ {
 
 		if i > 0 {
-			time.Sleep(cdata.Target.RetryPerRun.Pause.Duration)
+			time.Sleep(cdata.Target.RetriesPerRun.PauseBetweenAttempts.Duration)
 			log.Printf("retrying to report: %d", i)
 		}
 

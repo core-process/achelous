@@ -19,10 +19,10 @@ func upload(cdata *config.Config, queue commonQueue.QueueRef, id ulid.ULID) erro
 	var lastError error
 	lastError = nil
 
-	for i := 0; i < cdata.Target.RetryPerRun.Attempts; i++ {
+	for i := 0; i < cdata.Target.RetriesPerRun.Attempts; i++ {
 
 		if i > 0 {
-			time.Sleep(cdata.Target.RetryPerRun.Pause.Duration)
+			time.Sleep(cdata.Target.RetriesPerRun.PauseBetweenAttempts.Duration)
 			log.Printf("retrying to upload message %s in queue /%s (i=%d)", id, queue, i)
 		}
 
