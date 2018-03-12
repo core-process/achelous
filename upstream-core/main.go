@@ -41,7 +41,7 @@ func main() {
 
 	// create trigger signal channel
 	chanTriggerSig := make(chan os.Signal, 1)
-	signal.Notify(chanTriggerSig, syscall.SIGHUP)
+	signal.Notify(chanTriggerSig, syscall.SIGUSR1)
 
 	// main loop
 	cancelled := false
@@ -66,7 +66,7 @@ func main() {
 		case <-ctx.Done():
 			cancelled = true
 		case <-chanTriggerSig:
-			log.Printf("triggered queue run (SIGHUP)")
+			log.Printf("triggered queue run (SIGUSR1)")
 		case <-time.After(pauseBetweenRuns):
 			// noop
 		}

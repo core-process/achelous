@@ -55,6 +55,7 @@ void cmdstart(char **argv)
         signal(SIGINT, SIG_CORE);
         signal(SIGTERM, SIG_CORE);
         signal(SIGQUIT, SIG_CORE);
+        signal(SIGUSR1, SIG_CORE);
 
         if (waitpid(corepid, NULL, 0) == -1)
         {
@@ -152,14 +153,14 @@ void cmdtrigger()
         _exit(1);
     }
 
-    // send SIGHUB to process
-    if (kill(pid, SIGHUP) == -1)
+    // send SIGUSR1 to process
+    if (kill(pid, SIGUSR1) == -1)
     {
-        syslog(LOG_ERR, "failed to send SIGHUB to pid %d (errno=%d)", pid, errno);
+        syslog(LOG_ERR, "failed to send SIGUSR1 to pid %d (errno=%d)", pid, errno);
         _exit(1);
     }
 
-    syslog(LOG_INFO, "sent SIGHUB to service");
+    syslog(LOG_INFO, "sent SIGUSR1 to service");
     _exit(0);
 }
 
