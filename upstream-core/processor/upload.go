@@ -2,6 +2,7 @@ package processor
 
 import (
 	"errors"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -48,6 +49,14 @@ func upload(cdata *config.Config, queue commonQueue.QueueRef, id ulid.ULID) erro
 		}
 
 		defer res.Body.Close()
+
+		// read and discard response
+		_, err = ioutil.ReadAll(res.Body)
+		if err != nil {
+			// retry
+			lastError = err
+			continue
+		}
 
 		// check status code
 		if res.StatusCode < 200 || res.StatusCode >= 300 {
