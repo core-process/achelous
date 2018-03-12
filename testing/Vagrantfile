@@ -13,9 +13,13 @@ Vagrant.configure("2") do |config|
     achelous.vm.hostname = 'achelous'
     achelous.vm.network :private_network, ip: "192.168.56.101"
     achelous.vm.provision "file", source: "../.build/dist/achelous_1.0-1_amd64.deb", destination: "achelous_1.0-1_amd64.deb"
+    achelous.vm.provision "file", source: "./upstream.json", destination: "upstream.json"
     achelous.vm.provision "shell", inline: <<-SHELL
+      mkdir /etc/achelous
+      mv upstream.json /etc/achelous/
       apt-get -qq update
       apt-get -qq dist-upgrade
+      apt-get -y -qq install mc
       dpkg -i achelous_1.0-1_amd64.deb
       apt-get -y -qq install mailutils
     SHELL
@@ -31,6 +35,7 @@ Vagrant.configure("2") do |config|
     testservice.vm.provision "shell", inline: <<-SHELL
       apt-get -qq update
       apt-get -qq dist-upgrade
+      apt-get -y -qq install mc
       curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash -
       sudo apt-get -y -qq install nodejs
       adduser --disabled-password --gecos "" testservice

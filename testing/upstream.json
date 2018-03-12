@@ -1,0 +1,12 @@
+{
+	"Target": {
+		"Upload": {
+			"URL": "http://192.168.56.102:3000/upload",
+			"Header": { }
+		},
+		"Report": {
+			"URL": "http://192.168.56.102:3000/report",
+			"Header": { }
+		}
+	}
+}
