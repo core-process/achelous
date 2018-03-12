@@ -1,6 +1,7 @@
 package config
 
 type Config struct {
-	DefaultQueue string
-	PrettyJSON   bool
+	DefaultQueue    string
+	PrettyJSON      bool
+	TriggerQueueRun bool
 }

@@ -14,6 +14,7 @@ func Load() (*Config, error) {
 	var data Config
 	data.DefaultQueue = ""
 	data.PrettyJSON = true
+	data.TriggerQueueRun = true
 
 	// read file
 	raw, err := ioutil.ReadFile(commonConfig.SpringConfig)

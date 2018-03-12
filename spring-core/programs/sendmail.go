@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"errors"
 	"io"
+	"log"
 	"os"
 	"strings"
 
@@ -105,6 +106,14 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 	)
 	if err != nil {
 		return err
+	}
+
+	// trigger queue run
+	if cdata.TriggerQueueRun {
+		err = queue.Trigger()
+		if err != nil {
+			log.Printf("failed to trigger queue run: %v", err)
+		}
 	}
 
 	return nil
