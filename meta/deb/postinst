@@ -18,15 +18,11 @@ case "$1" in
         fi
 
         # enable systemd service
-        deb-systemd-helper enable achelous-upstream.service || true
-        deb-systemd-invoke restart achelous-upstream.service || true
-    ;;
+        deb-systemd-helper enable achelous-upstream.service >/dev/null || true
+        deb-systemd-invoke restart achelous-upstream.service >/dev/null || true
 
-    abort-upgrade|abort-remove|abort-deconfigure)
-    ;;
-
-    *)
-        echo "postinst called with unknown argument \`$1'" >&2
-        exit 1
+        # enable rc.d service
+        update-rc.d achelous-upstream defaults || true
+        invoke-rc.d achelous-upstream restart || true
     ;;
 esac

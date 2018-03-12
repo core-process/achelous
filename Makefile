@@ -63,8 +63,10 @@ dist: $(DEB)
 
 $(DEB): CONTENT = .build/dist/content
 $(DEB): $(BINARIES) meta/deb/*
+	rm -rf $(CONTENT)
 	# create directories
 	mkdir -p $(CONTENT)/DEBIAN
+	mkdir -p $(CONTENT)/etc/init.d/
 	mkdir -p $(CONTENT)/lib/systemd/system/
 	mkdir -p $(CONTENT)/usr/lib
 	mkdir -p $(CONTENT)/usr/sbin
@@ -72,12 +74,20 @@ $(DEB): $(BINARIES) meta/deb/*
 	chmod -R 755 $(CONTENT)
 	# assemble meta
 	envsubst < meta/deb/control > $(CONTENT)/DEBIAN/control
+	chmod 644 $(CONTENT)/DEBIAN/control
 	cp meta/deb/postinst $(CONTENT)/DEBIAN/
+	chmod 755 $(CONTENT)/DEBIAN/postinst
+	cp meta/deb/postrm $(CONTENT)/DEBIAN/
+	chmod 755 $(CONTENT)/DEBIAN/postrm
+	cp meta/deb/conffiles $(CONTENT)/DEBIAN/
+	chmod 644 $(CONTENT)/DEBIAN/conffiles
 	gzip --best -n < meta/deb/changelog > $(CONTENT)/usr/share/doc/achelous/changelog.Debian.gz
 	cp meta/deb/copyright $(CONTENT)/usr/share/doc/achelous/
 	chmod 644 $(CONTENT)/usr/share/doc/achelous/*
 	cp meta/achelous-upstream.service $(CONTENT)/lib/systemd/system/
 	chmod 644 $(CONTENT)/lib/systemd/system/*
+	cp meta/achelous-upstream $(CONTENT)/etc/init.d/achelous-upstream
+	chmod 755 $(CONTENT)/etc/init.d/*
 	# assemble content
 	for bin in $(BINARIES); do \
 		cp "$$bin" "$(CONTENT)/usr/sbin/achelous-$$(basename $$bin)"; \

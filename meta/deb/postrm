@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -e
+
+case "$1" in
+    purge)
+        deb-systemd-helper purge achelous-upstream.service >/dev/null || true
+        update-rc.d achelous-upstream remove >/dev/null || true
+    ;;
+esac

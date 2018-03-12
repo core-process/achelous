@@ -3,7 +3,7 @@ Version: ${VERSION}
 Section: mail
 Priority: optional
 Architecture: ${ARCHITECTURE}
-Depends: adduser, libc6
+Depends: adduser, libc6, lsb-base
 Replaces: mail-transport-agent
 Provides: mail-transport-agent
 Maintainer: Niklas Salmoukas <niklas@salmoukas.com>
