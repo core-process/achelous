@@ -113,11 +113,11 @@ void cmdstop()
     // kill process
     if (kill(pid, SIGTERM) == -1)
     {
-        syslog(LOG_ERR, "failed to kill pid %d (errno=%d)", pid, errno);
+        syslog(LOG_ERR, "failed to send SIGTERM to pid %d (errno=%d)", pid, errno);
         _exit(1);
     }
 
-    syslog(LOG_INFO, "sent kill signal to service");
+    syslog(LOG_INFO, "sent SIGTERM to service");
     _exit(0);
 }
 
@@ -138,6 +138,28 @@ void cmdstatus()
         printf("running [%d]\n", pid);
     }
     fflush(stdout);
+    _exit(0);
+}
+
+void cmdtrigger()
+{
+    // read pid
+    int pid = readpid(CONFIG_UPSTREAM_PID);
+
+    if (!pid)
+    {
+        syslog(LOG_ERR, "failed to read pid from file");
+        _exit(1);
+    }
+
+    // send SIGHUB to process
+    if (kill(pid, SIGHUP) == -1)
+    {
+        syslog(LOG_ERR, "failed to send SIGHUB to pid %d (errno=%d)", pid, errno);
+        _exit(1);
+    }
+
+    syslog(LOG_INFO, "sent SIGHUB to service");
     _exit(0);
 }
 
@@ -162,6 +184,12 @@ int main(int argc, char **argv)
     if (strcmp(argv[1], "status") == 0)
     {
         cmdstatus();
+    }
+
+    // trigger queue run (does not return)
+    if (strcmp(argv[1], "trigger") == 0)
+    {
+        cmdtrigger();
     }
 
     return 0;

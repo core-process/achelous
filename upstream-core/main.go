@@ -22,10 +22,10 @@ func main() {
 	}
 	log.SetOutput(logwriter)
 
-	// create signal channel
-	csig := make(chan os.Signal, 1)
+	// create exit signal channel
+	chanExitSig := make(chan os.Signal, 1)
 	signal.Notify(
-		csig,
+		chanExitSig,
 		syscall.SIGINT,
 		syscall.SIGTERM,
 		syscall.SIGQUIT,
@@ -34,10 +34,14 @@ func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
-		sig := <-csig
-		log.Println("exiting... (" + sig.String() + ")")
+		exitSig := <-chanExitSig
+		log.Println("exiting... (" + exitSig.String() + ")")
 		cancel()
 	}()
+
+	// create trigger signal channel
+	chanTriggerSig := make(chan os.Signal, 1)
+	signal.Notify(chanTriggerSig, syscall.SIGHUP)
 
 	// main loop
 	cancelled := false
@@ -61,6 +65,8 @@ func main() {
 		select {
 		case <-ctx.Done():
 			cancelled = true
+		case <-chanTriggerSig:
+			log.Printf("triggered queue run (SIGHUP)")
 		case <-time.After(pauseBetweenRuns):
 			// noop
 		}
