@@ -5,3 +5,4 @@ import:
 - package: github.com/oklog/ulid
   version: ^0.3.0
 - package: github.com/vrischmann/jsonutil
+- package: github.com/mitchellh/go-ps

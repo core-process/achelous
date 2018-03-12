@@ -1,5 +1,5 @@
-hash: 644de74d274839603571b4158935ad7c6a0540c064106c6399b76406b1d662e9
-updated: 2018-03-12T01:16:08.14507523+01:00
+hash: ebad31c5769139d0ff5371fb3b3e9fca42934bc6b49bbf516cf839f02f0e2afa
+updated: 2018-03-12T03:02:33.503906651+01:00
 imports:
 - name: github.com/jaytaylor/html2text
   version: 190166da35878a77103b951ae035a473531c1fc2
@@ -10,6 +10,8 @@ imports:
   - internal/stringutil
 - name: github.com/mattn/go-runewidth
   version: a9d6d1e4dc51df2130326793d49971f238839169
+- name: github.com/mitchellh/go-ps
+  version: 4fdf99ab29366514c69ccccddab5dc58b8d84062
 - name: github.com/oklog/ulid
   version: d311cb43c92434ec4072dfbbda3400741d0a6337
 - name: github.com/olekukonko/tablewriter
