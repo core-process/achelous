@@ -3,7 +3,6 @@ package queue
 import (
 	"errors"
 	"io/ioutil"
-	"log"
 	"strconv"
 	"syscall"
 
@@ -28,10 +27,7 @@ func Trigger() error {
 	// send SIGUSR1 signal
 	err = syscall.Kill(int(pid), syscall.SIGUSR1)
 	if err != nil {
-		log.Printf("failed to send SIGUSR1 to primary process: %v", err)
-
 		// retrieve list of all processes
-		log.Printf("trying to send SIGUSR1 to child processes...")
 		procs, err := ps.Processes()
 		if err != nil {
 			return err
@@ -45,9 +41,7 @@ func Trigger() error {
 			if proc.PPid() == int(pid) {
 				// send SIGUSR1 to child process
 				err = syscall.Kill(proc.Pid(), syscall.SIGUSR1)
-				if err != nil {
-					log.Printf("failed to send SIGUSR1 to child process %d: %v", proc.Pid(), err)
-				} else {
+				if err == nil {
 					sentToChild = true
 				}
 			}
