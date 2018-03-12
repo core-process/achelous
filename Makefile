@@ -12,7 +12,7 @@ BINARIES = \
 
 # environment
 export GOPATH       = $(CURDIR)/.build
-export ARCHITECTURE = $(subst x86_64,amd64,$(shell uname -m))
+export ARCHITECTURE = $(shell dpkg --print-architecture)
 
 # settings
 include settings.mk
