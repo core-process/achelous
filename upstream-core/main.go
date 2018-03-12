@@ -56,7 +56,7 @@ func main() {
 		select {
 		case <-ctx.Done():
 			cancelled = true
-		case <-time.After(cdata.PauseBetweenRuns):
+		case <-time.After(cdata.PauseBetweenRuns.Duration):
 			// noop
 		}
 	}

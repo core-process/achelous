@@ -1,11 +1,11 @@
 package config
 
 import (
-	"time"
+	"github.com/vrischmann/jsonutil"
 )
 
 type Config struct {
-	PauseBetweenRuns time.Duration
+	PauseBetweenRuns jsonutil.Duration
 	Target           struct {
 		Upload struct {
 			URL    *string
@@ -17,7 +17,7 @@ type Config struct {
 		}
 		RetryPerRun struct {
 			Attempts int
-			Pause    time.Duration
+			Pause    jsonutil.Duration
 		}
 	}
 }

@@ -29,7 +29,7 @@ func report(cdata *config.Config, OK bool) error {
 	for i := 0; i < cdata.Target.RetryPerRun.Attempts; i++ {
 
 		if i > 0 {
-			time.Sleep(cdata.Target.RetryPerRun.Pause)
+			time.Sleep(cdata.Target.RetryPerRun.Pause.Duration)
 			log.Printf("retrying to report: %d", i)
 		}
 

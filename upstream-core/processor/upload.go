@@ -22,7 +22,7 @@ func upload(cdata *config.Config, queue commonQueue.QueueRef, id ulid.ULID) erro
 	for i := 0; i < cdata.Target.RetryPerRun.Attempts; i++ {
 
 		if i > 0 {
-			time.Sleep(cdata.Target.RetryPerRun.Pause)
+			time.Sleep(cdata.Target.RetryPerRun.Pause.Duration)
 			log.Printf("retrying to upload message %s in queue /%s (i=%d)", id, queue, i)
 		}
 

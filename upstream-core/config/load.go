@@ -7,15 +7,17 @@ import (
 	"time"
 
 	commonConfig "github.com/core-process/achelous/common/config"
+
+	"github.com/vrischmann/jsonutil"
 )
 
 func Load() (*Config, error) {
 
 	// set default data
 	var data Config
-	data.PauseBetweenRuns = 15 * time.Second
+	data.PauseBetweenRuns = jsonutil.FromDuration(15 * time.Second)
 	data.Target.RetryPerRun.Attempts = 3
-	data.Target.RetryPerRun.Pause = 3 * time.Second
+	data.Target.RetryPerRun.Pause = jsonutil.FromDuration(3 * time.Second)
 
 	// read file
 	raw, err := ioutil.ReadFile(commonConfig.UpstreamConfig)
