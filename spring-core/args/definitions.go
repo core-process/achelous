@@ -318,8 +318,10 @@ type SmArgs struct {
 	//             character names only. The short names are not described in
 	//             this manual page; see the Sendmail Installation and Operation
 	//             Guide for details.
-	// NOTE: we support -oi only for now
-	Arg_oi bool `args:"flag"`
+	// NOTE: we support -oi, -om and -oem only for now
+	Arg_oi  bool `args:"flag"`
+	Arg_om  bool `args:"flag"`
+	Arg_oem bool `args:"flag"`
 
 	// -pprotocol  Set the name of the protocol used to receive the message.
 	//             This can be a simple protocol name such as ``UUCP'' or a pro-
