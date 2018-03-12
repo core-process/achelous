@@ -13,7 +13,7 @@ extern int readpid(const char *pidfile);
 struct pidfh* daemonise(const char* pidpath)
 {
     // lock pid file
-    struct pidfh* pfh = pidfile_open(pidpath, 0600, NULL);
+    struct pidfh* pfh = pidfile_open(pidpath, 0644, NULL);
     if (pfh == NULL)
     {
         syslog(LOG_ERR, "failed to lock pid file (errno=%d)", errno);
