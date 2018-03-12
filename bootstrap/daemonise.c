@@ -37,7 +37,8 @@ struct pidfh* daemonise(const char* pidpath)
     else if (pid != 0)
     {
         // wait 10 sec for pid file to be written
-        for(time_t ts = time(NULL); (time(NULL) - ts) <= 10;)
+        time_t ts;
+        for(ts = time(NULL); (time(NULL) - ts) <= 10;)
         {
             sleep(1);
 
