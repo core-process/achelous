@@ -55,6 +55,10 @@ func Parse(argv []string) (ArgProgram, *SmArgs, *MqArgs, []string, error) {
 
 	for ai := 1; ai < len(argv); ai++ {
 		if strings.HasPrefix(argv[ai], "-") {
+			// ignore empty arg
+			if argv[ai] == "-" || argv[ai] == "--" {
+				continue
+			}
 			// make sure params and free values are not mixed
 			if len(resultValues) > 0 {
 				return resultProgram,
