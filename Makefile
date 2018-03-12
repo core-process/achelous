@@ -66,6 +66,7 @@ $(DEB): $(BINARIES) meta/deb/*
 	# create directories
 	mkdir -p $(CONTENT)/DEBIAN
 	mkdir -p $(CONTENT)/lib/systemd/system/
+	mkdir -p $(CONTENT)/usr/lib
 	mkdir -p $(CONTENT)/usr/sbin
 	mkdir -p $(CONTENT)/usr/share/doc/achelous
 	chmod -R 755 $(CONTENT)
@@ -87,6 +88,7 @@ $(DEB): $(BINARIES) meta/deb/*
 	for alias in sendmail mailq newaliases; do \
 		ln -sf "achelous-spring" "$(CONTENT)/usr/sbin/$$alias"; \
 	done
+	ln -sf "../sbin/sendmail" "$(CONTENT)/usr/lib/sendmail"
 	# pack deb
 	cd .build/dist && fakeroot dpkg-deb --build content $(notdir $@)
 
