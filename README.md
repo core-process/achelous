@@ -85,6 +85,22 @@ Example `/etc/achelous/upstream.json`
 }
 ```
 
+## Usage
+
+Submit emails exactly as before, e.g.
+
+```sh
+
+echo "Lorem body..." | mail -r "sender@mail.com" -s "Lorem subject..." "receiver@mail.com"
+
+sendmail -i "receiver@mail.com" <<EOF
+Subject: Lorem subject...
+From: sender@mail.com
+
+Lorem body...
+EOF
+
+```
 
 ## Upload and Report Protocol
 
