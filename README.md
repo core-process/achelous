@@ -106,10 +106,31 @@ EOF
 
 Uploading and reporting is done via a `POST` request. The URL as well as the headers to be sent are fully configurable via the configuration file `/etc/achelous/upstream.json`.
 
-The following *JSON Schema* specifies the request body of the upload request:
+We provide the following example of the request body for your convenience. You will find formal specifications in the [specs](./specs/) folder.
 
 ```json
-TODO
+{
+  "id": "01C8EDWZM57VXWY2VJNBNXHA01",
+  "timestamp": "2018-03-13T01:59:26.213363817+01:00",
+  "participants": {
+    "from": {
+      "name": "Sender User",
+      "email": "sender@mail.com"
+    },
+    "to": [
+      {
+        "name": "Receiver User",
+        "email": "receiver@mail.com"
+      }
+    ]
+  },
+  "subject": "Lorem subject...",
+  "body": {
+    "text": "Lorem body...\n",
+    "html": ""
+  },
+  "attachments": []
+}
 ```
 
-The reporting request is performed on successful queue runs only (success measure). The request body is empty.
+The reporting request is performed on successful queue runs only. The request body is empty.
