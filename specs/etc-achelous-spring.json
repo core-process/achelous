@@ -1,0 +1,19 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "DefaultQueue": {
+            "type": "string",
+            "description": "Relative queue path. The empty string represents the root or default queue."
+        },
+        "PrettyJSON": {
+            "type": "boolean",
+            "description": "Activates pretty printing of the email to be submitted to the queue."
+        },
+        "TriggerQueueRun": {
+            "type": "boolean",
+            "description": "Triggers a queue run on new mail submissions to reduce delays."
+        }
+    },
+    "required": []
+}

@@ -44,9 +44,9 @@ Create and adjust the configuration files `/etc/achelous/spring.json` and `/etc/
 
 **Note:** Usually specific reloading procedures are not required. `spring` reads its configuration file on every call. `upstream` reads its configuration file on every queue run.
 
-### Examples
+The following examples are provided for your convenience. You will find formal specifications in the [specs](./specs/) folder.
 
-`/etc/achelous/spring.json`
+Example `/etc/achelous/spring.json`
 
 ```json
 {
@@ -56,7 +56,7 @@ Create and adjust the configuration files `/etc/achelous/spring.json` and `/etc/
 }
 ```
 
-`/etc/achelous/upstream.json`
+Example `/etc/achelous/upstream.json`
 
 ```json
 {
@@ -85,133 +85,6 @@ Create and adjust the configuration files `/etc/achelous/spring.json` and `/etc/
 }
 ```
 
-### Specification
-
-`/etc/achelous/spring.json`
-
-```json
-{
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "DefaultQueue": {
-      "type": "string",
-      "description": "Relative queue path. The empty string represents the root or default queue."
-    },
-    "PrettyJSON": {
-      "type": "boolean",
-      "description": "Activates pretty printing of the email to be submitted to the queue."
-    },
-    "TriggerQueueRun": {
-      "type": "boolean",
-      "description": "Triggers a queue run on new mail submissions to reduce delays."
-    }
-  },
-  "required": []
-}
-```
-
-`/etc/achelous/upstream.json`
-
-```json
-{
-  "type": "object",
-  "additionalProperties": false,
-  "properties": {
-    "PauseBetweenRuns": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "PreviousRunOK": {
-          "type": "string",
-          "pattern": "^([0-9]+[hms])+$",
-          "description": "Pause till next queue run in case the previous queue run was successful."
-        },
-        "PreviousRunWithErrors": {
-          "type": "string",
-          "pattern": "^([0-9]+[hms])+$",
-          "description": "Pause till next queue run in case the previous queue run failed partially or completely."
-        }
-      },
-      "required": []
-    },
-    "Target": {
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "Upload": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "URL": {
-              "type": "string",
-              "description": "The URL used for mail uploads via POST."
-            },
-            "Header": {
-              "type": "object",
-              "description": "The headers used for mail uploads.",
-              "additionalProperties": false,
-              "properties": {
-                "Authorization": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "required": []
-            }
-          },
-          "required": []
-        },
-        "Report": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "URL": {
-              "type": "string",
-              "description": "The URL used for success reporting via POST."
-            },
-            "Header": {
-              "type": "object",
-              "description": "The headers used for success reporting uploads.",
-              "additionalProperties": false,
-              "properties": {
-                "Authorization": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  }
-                }
-              },
-              "required": []
-            }
-          },
-          "required": []
-        },
-        "RetriesPerRun": {
-          "type": "object",
-          "additionalProperties": false,
-          "properties": {
-            "Attempts": {
-              "type": "integer",
-              "description": "Number of successive retries in case an upload failes, before giving up during the current queue run."
-            },
-            "PauseBetweenAttempts": {
-              "type": "string",
-              "pattern": "^([0-9]+[hms])+$",
-              "description": "Pause between successive retries."
-            }
-          },
-          "required": []
-        }
-      },
-      "required": []
-    }
-  },
-  "required": []
-}
-```
 
 ## Upload and Report Protocol
 

@@ -1,0 +1,97 @@
+{
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "PauseBetweenRuns": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "PreviousRunOK": {
+                    "type": "string",
+                    "pattern": "^([0-9]+[hms])+$",
+                    "description": "Pause till next queue run in case the previous queue run was successful."
+                },
+                "PreviousRunWithErrors": {
+                    "type": "string",
+                    "pattern": "^([0-9]+[hms])+$",
+                    "description": "Pause till next queue run in case the previous queue run failed partially or completely."
+                }
+            },
+            "required": []
+        },
+        "Target": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Upload": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "URL": {
+                            "type": "string",
+                            "description": "The URL used for mail uploads via POST."
+                        },
+                        "Header": {
+                            "type": "object",
+                            "description": "The headers used for mail uploads.",
+                            "additionalProperties": false,
+                            "properties": {
+                                "Authorization": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "required": []
+                        }
+                    },
+                    "required": []
+                },
+                "Report": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "URL": {
+                            "type": "string",
+                            "description": "The URL used for success reporting via POST."
+                        },
+                        "Header": {
+                            "type": "object",
+                            "description": "The headers used for success reporting uploads.",
+                            "additionalProperties": false,
+                            "properties": {
+                                "Authorization": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string"
+                                    }
+                                }
+                            },
+                            "required": []
+                        }
+                    },
+                    "required": []
+                },
+                "RetriesPerRun": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "Attempts": {
+                            "type": "integer",
+                            "description": "Number of successive retries in case an upload failes, before giving up during the current queue run."
+                        },
+                        "PauseBetweenAttempts": {
+                            "type": "string",
+                            "pattern": "^([0-9]+[hms])+$",
+                            "description": "Pause between successive retries."
+                        }
+                    },
+                    "required": []
+                }
+            },
+            "required": []
+        }
+    },
+    "required": []
+}
