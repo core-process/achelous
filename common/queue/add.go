@@ -1,17 +1,11 @@
 package queue
 
 import (
-	"crypto/rand"
 	"encoding/json"
-	"net/mail"
 	"os"
-	"time"
-
-	"github.com/jhillyerd/enmime"
-	"github.com/oklog/ulid"
 )
 
-func Add(queue QueueRef, envelope *enmime.Envelope, prettyJSON bool) error {
+func Add(queue QueueRef, message Message, prettyJSON bool) error {
 
 	// ensure existence of queue directory
 	err := os.MkdirAll(
@@ -22,119 +16,8 @@ func Add(queue QueueRef, envelope *enmime.Envelope, prettyJSON bool) error {
 		return err
 	}
 
-	// prepare message header
-	var msg Message
-	msg.Participants.To = []Participant{}
-	msg.Attachments = []Attachment{}
-
-	dateStr := envelope.GetHeader("Date")
-	if len(dateStr) > 0 {
-		formats := []string{
-			"Mon, _2 Jan 2006 15:04:05 MST",
-			"Mon, _2 Jan 2006 15:04:05 -0700",
-			time.RFC1123,
-			time.RFC1123Z,
-			time.ANSIC,
-			time.UnixDate,
-			time.RubyDate,
-			time.RFC822,
-			time.RFC822Z,
-			time.RFC850,
-			time.RFC3339,
-			time.RFC3339Nano,
-		}
-		var timestamp time.Time
-		var err error
-		for _, format := range formats {
-			timestamp, err = time.Parse(format, dateStr)
-			if err == nil {
-				break
-			}
-		}
-		if err != nil {
-			return err
-		}
-		msg.Timestamp = timestamp
-	} else {
-		msg.Timestamp = time.Now()
-	}
-
-	addresses, err := envelope.AddressList("From")
-	if err != mail.ErrHeaderNotPresent {
-		if err != nil && err.Error() == "mail: no angle-addr" {
-			msg.Participants.From = &Participant{
-				Name:  envelope.GetHeader("From"),
-				Email: "",
-			}
-		} else if err != nil {
-			return err
-		} else {
-			for _, address := range addresses {
-				msg.Participants.From = &Participant{
-					Name:  address.Name,
-					Email: address.Address,
-				}
-				break
-			}
-		}
-
-	}
-
-	addresses, err = envelope.AddressList("To")
-	if err != mail.ErrHeaderNotPresent {
-		if err != nil && err.Error() == "mail: no angle-addr" {
-			msg.Participants.To = append(
-				msg.Participants.To,
-				Participant{
-					Name:  envelope.GetHeader("To"),
-					Email: "",
-				},
-			)
-		} else if err != nil {
-			return err
-		} else {
-			for _, address := range addresses {
-				msg.Participants.To = append(
-					msg.Participants.To,
-					Participant{
-						Name:  address.Name,
-						Email: address.Address,
-					},
-				)
-			}
-		}
-	}
-
-	msg.Subject = envelope.GetHeader("Subject")
-
-	// prepare message body
-	msg.Body.Text = envelope.Text
-	msg.Body.HTML = envelope.HTML
-
-	// add attachment data
-	for _, attachment := range envelope.Attachments {
-		msg.Attachments = append(
-			msg.Attachments,
-			Attachment{
-				ID:      attachment.ContentID,
-				Type:    attachment.ContentType,
-				Charset: attachment.Charset,
-				Name:    attachment.FileName,
-				Content: attachment.Content,
-			},
-		)
-	}
-
-	// generate a ulid for message
-	id, err := ulid.New(ulid.Now(), rand.Reader)
-	if err != nil {
-		return err
-	}
-
-	msg.ID = id
-
 	// write message data
-	pathPreparing := MessagePath(queue, id, MessageStatusPreparing)
+	pathPreparing := MessagePath(queue, message.ID, MessageStatusPreparing)
 
 	file, err := os.Create(pathPreparing)
 	if err != nil {
@@ -148,7 +31,7 @@ func Add(queue QueueRef, envelope *enmime.Envelope, prettyJSON bool) error {
 	}
 	encoder.SetEscapeHTML(false)
 
-	if err = encoder.Encode(msg); err != nil {
+	if err = encoder.Encode(message); err != nil {
 		return err
 	}
 
@@ -161,7 +44,7 @@ func Add(queue QueueRef, envelope *enmime.Envelope, prettyJSON bool) error {
 	}
 
 	// change message state to queued
-	pathQueued := MessagePath(queue, id, MessageStatusQueued)
+	pathQueued := MessagePath(queue, message.ID, MessageStatusQueued)
 
 	err = os.Rename(
 		pathPreparing,

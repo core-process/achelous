@@ -15,6 +15,11 @@ func Load() (*Config, error) {
 	data.DefaultQueue = ""
 	data.PrettyJSON = true
 	data.TriggerQueueRun = true
+	data.GenerateDebugMail.OnUnknownParameters = false
+	data.GenerateDebugMail.OnParsingErrors = false
+	data.GenerateDebugMail.OnEmptyInput = false
+	data.GenerateDebugMail.Sender.Name = "Achelous Spring"
+	data.GenerateDebugMail.Receiver.Name = "Devops"
 
 	// read file
 	raw, err := ioutil.ReadFile(commonConfig.SpringConfig)

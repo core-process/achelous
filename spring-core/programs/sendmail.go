@@ -2,22 +2,26 @@ package programs
 
 import (
 	"bufio"
+	"crypto/rand"
 	"errors"
 	"io"
 	"log"
+	"net/mail"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/core-process/achelous/common/queue"
 	"github.com/core-process/achelous/spring-core/args"
 	"github.com/core-process/achelous/spring-core/config"
 
 	"github.com/jhillyerd/enmime"
+	"github.com/oklog/ulid"
 )
 
 func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) error {
 
-	// filter stdin and stop at single-dot-line
+	// prepare input
 	ignoreDot := smArgs.Arg_i || smArgs.Arg_oi || smArgs.Arg_O.Opt_IgnoreDots
 
 	filterReader, filterWriter := io.Pipe()
@@ -74,7 +78,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 		return err
 	}
 
-	// check for errors
+	// check for parsing errors
 	if len(envelope.Errors) > 0 {
 		errMsg := "Parsing failed:"
 		for _, v := range envelope.Errors {
@@ -83,7 +87,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 		return errors.New(errMsg)
 	}
 
-	// enhance From and To
+	// feed values from args to from and to
 	if len(envelope.Root.Header.Get("From")) == 0 {
 		if smArgs.Arg_f != nil && smArgs.Arg_F != nil {
 			envelope.Root.Header.Set("From", *smArgs.Arg_F+" <"+*smArgs.Arg_f+">")
@@ -98,10 +102,123 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 		envelope.Root.Header.Set("To", strings.Join(recipients, ", "))
 	}
 
-	// add to queue
+	// create message structure
+	msgID, err := ulid.New(ulid.Now(), rand.Reader)
+	if err != nil {
+		return err
+	}
+
+	message := queue.Message{ID: msgID}
+
+	message.Participants.To = []queue.Participant{}
+	message.Attachments = []queue.Attachment{}
+
+	// extract timestamp
+	dateStr := envelope.GetHeader("Date")
+	if len(dateStr) > 0 {
+		formats := []string{
+			"Mon, _2 Jan 2006 15:04:05 MST",
+			"Mon, _2 Jan 2006 15:04:05 -0700",
+			time.RFC1123,
+			time.RFC1123Z,
+			time.ANSIC,
+			time.UnixDate,
+			time.RubyDate,
+			time.RFC822,
+			time.RFC822Z,
+			time.RFC850,
+			time.RFC3339,
+			time.RFC3339Nano,
+		}
+		var timestamp time.Time
+		var err error
+		for _, format := range formats {
+			timestamp, err = time.Parse(format, dateStr)
+			if err == nil {
+				break
+			}
+		}
+		if err != nil {
+			return err
+		}
+		message.Timestamp = timestamp
+	} else {
+		message.Timestamp = time.Now()
+	}
+
+	// extract from
+	addresses, err := envelope.AddressList("From")
+	if err != mail.ErrHeaderNotPresent {
+		if err != nil && err.Error() == "mail: no angle-addr" {
+			message.Participants.From = &queue.Participant{
+				Name:  envelope.GetHeader("From"),
+				Email: "",
+			}
+		} else if err != nil {
+			return err
+		} else {
+			for _, address := range addresses {
+				message.Participants.From = &queue.Participant{
+					Name:  address.Name,
+					Email: address.Address,
+				}
+				break
+			}
+		}
+
+	}
+
+	// extract to
+	addresses, err = envelope.AddressList("To")
+	if err != mail.ErrHeaderNotPresent {
+		if err != nil && err.Error() == "mail: no angle-addr" {
+			message.Participants.To = append(
+				message.Participants.To,
+				queue.Participant{
+					Name:  envelope.GetHeader("To"),
+					Email: "",
+				},
+			)
+		} else if err != nil {
+			return err
+		} else {
+			for _, address := range addresses {
+				message.Participants.To = append(
+					message.Participants.To,
+					queue.Participant{
+						Name:  address.Name,
+						Email: address.Address,
+					},
+				)
+			}
+		}
+	}
+
+	// extract subject
+	message.Subject = envelope.GetHeader("Subject")
+
+	// extract message body
+	message.Body.Text = envelope.Text
+	message.Body.HTML = envelope.HTML
+
+	// extract attachment data
+	for _, attachment := range envelope.Attachments {
+		message.Attachments = append(
+			message.Attachments,
+			queue.Attachment{
+				ID:      attachment.ContentID,
+				Type:    attachment.ContentType,
+				Charset: attachment.Charset,
+				Name:    attachment.FileName,
+				Content: attachment.Content,
+			},
+		)
+	}
+
+	// add message to queue
 	err = queue.Add(
 		queue.QueueRef(cdata.DefaultQueue),
-		envelope,
+		message,
 		cdata.PrettyJSON,
 	)
 	if err != nil {
