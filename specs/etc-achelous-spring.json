@@ -2,6 +2,10 @@
     "type": "object",
     "additionalProperties": false,
     "properties": {
+        "AbortOnParseErrors": {
+            "type": "boolean",
+            "description": "Activates abort of mail submission on parse errors."
+        },
         "DefaultQueue": {
             "type": "string",
             "description": "Relative queue path. The empty string represents the root or default queue."
@@ -13,6 +17,65 @@
         "TriggerQueueRun": {
             "type": "boolean",
             "description": "Triggers a queue run on new mail submissions to reduce delays."
+        },
+        "GenerateDebugMail": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "OnInvalidParameters": {
+                    "type": "boolean",
+                    "description": "Generate debug message when observing invalid program parameters."
+                },
+                "OnParsingErrors": {
+                    "type": "boolean",
+                    "description": "Generate debug message when observing mail parse errors."
+                },
+                "OnOtherErrors": {
+                    "type": "boolean",
+                    "description": "Generate debug message when observice other kind of errors."
+                },
+                "Message": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                        "Sender": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "Name": {
+                                    "type": "string"
+                                },
+                                "Email": {
+                                    "type": "string",
+                                    "format": "email"
+                                }
+                            },
+                            "required": []
+                        },
+                        "Receiver": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "Name": {
+                                    "type": "string"
+                                },
+                                "Email": {
+                                    "type": "string",
+                                    "format": "email"
+                                }
+                            },
+                            "required": []
+                        },
+                        "Subject":{
+                            "type": "string"
+                        },
+                        "Body":{
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "required": []
         }
     },
     "required": []
