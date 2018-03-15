@@ -27,6 +27,9 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 
 	filterReader, filterWriter := io.Pipe()
 
+	debugInfoStoppedAtDotLine := false
+	debugInfoEndOfHeaderSimulated := false
+
 	go func() {
 		// close writer at end of func
 		defer filterWriter.Close()
@@ -42,6 +45,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 			currentLine++
 			// handle "."
 			if !ignoreDot && line == "." {
+				debugInfoStoppedAtDotLine = true
 				break
 			}
 			// handle end of header
@@ -55,6 +59,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 					isContLine := strings.IndexAny(line, " \t") == 0 && currentLine > 0
 
 					if !isHeaderLine && !isContLine {
+						debugInfoEndOfHeaderSimulated = true
 						line = "\n" + line
 						headerSection = false
 					}
@@ -76,7 +81,15 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 	// parse envelope
 	envelope, err := enmime.ReadEnvelope(filterReader)
 	if err != nil {
-		debug.MailOn(debug.OtherErrors, cdata, nil, err, nil)
+		debug.MailOn(debug.OtherErrors, cdata, "parsing email", nil, err, struct {
+			IgnoreDotEnabled     bool
+			StoppedAtDotLine     bool
+			EndOfHeaderSimulated bool
+		}{
+			ignoreDot,
+			debugInfoStoppedAtDotLine,
+			debugInfoEndOfHeaderSimulated,
+		})
 		return err
 	}
 
@@ -89,7 +102,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 		}
 		err = errors.New(errMsg)
 		// handle error
-		debug.MailOn(debug.ParsingErrors, cdata, nil, err, nil)
+		debug.MailOn(debug.ParsingErrors, cdata, "parsing error validation", nil, err, envelope.Errors)
 		if cdata.AbortOnParseErrors {
 			return err
 		}
@@ -114,7 +127,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 	// create message
 	msgID, err := ulid.New(ulid.Now(), rand.Reader)
 	if err != nil {
-		debug.MailOn(debug.OtherErrors, cdata, nil, err, nil)
+		debug.MailOn(debug.OtherErrors, cdata, "creating message id", nil, err, nil)
 		return err
 	}
 
@@ -149,7 +162,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 			}
 		}
 		if err != nil {
-			debug.MailOn(debug.ParsingErrors, cdata, nil, err, nil)
+			debug.MailOn(debug.ParsingErrors, cdata, "parsing timestamp", &msgID, err, dateStr)
 			if cdata.AbortOnParseErrors {
 				return err
 			}
@@ -170,7 +183,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 				Email: "",
 			}
 		} else if err != nil {
-			debug.MailOn(debug.ParsingErrors, cdata, nil, err, nil)
+			debug.MailOn(debug.ParsingErrors, cdata, "parsing 'from' field", &msgID, err, envelope.GetHeader("From"))
 			if cdata.AbortOnParseErrors {
 				return err
 			}
@@ -202,7 +215,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 				},
 			)
 		} else if err != nil {
-			debug.MailOn(debug.ParsingErrors, cdata, nil, err, nil)
+			debug.MailOn(debug.ParsingErrors, cdata, "parsing 'to' field", &msgID, err, envelope.GetHeader("To"))
 			if cdata.AbortOnParseErrors {
 				return err
 			}
@@ -255,7 +268,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 		cdata.PrettyJSON,
 	)
 	if err != nil {
-		debug.MailOn(debug.OtherErrors, cdata, nil, err, nil)
+		debug.MailOn(debug.OtherErrors, cdata, "submitting email to queue", &msgID, err, message)
 		return err
 	}
 

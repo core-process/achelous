@@ -31,7 +31,7 @@ func main() {
 	program, smArgs, mqArgs, values, err := args.Parse(os.Args)
 	if err != nil {
 		log.Printf("failed to parse arguments: %v", err)
-		debug.MailOn(debug.InvalidParameters, cdata, nil, err, nil)
+		debug.MailOn(debug.InvalidParameters, cdata, "parsing arguments", nil, err, os.Args)
 		os.Exit(1)
 	}
 

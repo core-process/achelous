@@ -20,7 +20,7 @@ const (
 	OtherErrors       ErrorCategory = 3
 )
 
-func MailOn(category ErrorCategory, cdata *config.Config, ref *ulid.ULID, err error, data interface{}) {
+func MailOn(category ErrorCategory, cdata *config.Config, activity string, ref *ulid.ULID, err error, data interface{}) {
 
 	// check if we should generate a debug mail
 	shouldSend := (category == InvalidParameters && cdata.GenerateDebugMail.OnInvalidParameters) ||
@@ -54,8 +54,8 @@ func MailOn(category ErrorCategory, cdata *config.Config, ref *ulid.ULID, err er
 		refStr = ref.String()
 	}
 
-	message.Subject = fmt.Sprintf(cdata.GenerateDebugMail.Message.Subject, refStr, err.Error(), data)
-	message.Body.Text = fmt.Sprintf(cdata.GenerateDebugMail.Message.Body, refStr, err.Error(), data)
+	message.Subject = fmt.Sprintf(cdata.GenerateDebugMail.Message.Subject, activity, refStr, err.Error(), data)
+	message.Body.Text = fmt.Sprintf(cdata.GenerateDebugMail.Message.Body, activity, refStr, err.Error(), data)
 
 	// add message to queue
 	err = queue.Add(
