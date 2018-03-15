@@ -57,7 +57,7 @@ $(BIN):
 DEB = .build/dist/achelous_$(VERSION)_$(ARCHITECTURE).deb
 
 # NOTE: use the following command to verify quality of deb file:
-# lintian --no-tag-display-limit .build/dist/achelous_1.0-1_amd64.deb
+# lintian --no-tag-display-limit .build/dist/achelous_*.deb
 
 dist: $(DEB)
 
