@@ -11,6 +11,10 @@
 		"Report": {
 			"URL": "http://192.168.56.102:3000/report",
 			"Header": { }
+		},
+		"RetriesPerRun": {
+			"Attempts": 3,
+			"PauseBetweenAttempts": "10s"
 		}
 	}
 }
