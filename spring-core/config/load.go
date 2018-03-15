@@ -24,7 +24,7 @@ func Load() (*Config, error) {
 	data.GenerateDebugMail.Message.Sender.Name = "Achelous Spring"
 	data.GenerateDebugMail.Message.Receiver.Name = "Devops"
 	data.GenerateDebugMail.Message.Subject = "ACHELOUS SPRING DEBUG MESSAGE"
-	data.GenerateDebugMail.Message.Body = "Activity: %[1]s\nReference: %[2]s\nError: %[3]s\nData: %[4]v"
+	data.GenerateDebugMail.Message.Body = "Activity: %[1]s\nReference: %[2]s\nError: %[3]v\nData: %[4]v"
 
 	// read file
 	raw, err := ioutil.ReadFile(commonConfig.SpringConfig)

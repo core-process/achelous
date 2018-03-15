@@ -50,9 +50,27 @@ Example `/etc/achelous/spring.json`
 
 ```json
 {
+  "AbortOnParseErrors": false,
   "DefaultQueue": "",
   "PrettyJSON": false,
-  "TriggerQueueRun": true
+  "TriggerQueueRun": true,
+  "GenerateDebugMail": {
+    "OnInvalidParameters": false,
+    "OnParsingErrors": false,
+    "OnOtherErrors": false,
+    "Message": {
+      "Sender": {
+        "Name": "Achelous Spring",
+        "Email": ""
+      },
+      "Receiver": {
+        "Name": "Devops",
+        "Email": ""
+      },
+      "Subject": "ACHELOUS SPRING DEBUG MESSAGE",
+      "Body": "Activity: %[1]s\nReference: %[2]s\nError: %[3]s\nData: %[4]v"
+    }
+  }
 }
 ```
 
