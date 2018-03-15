@@ -68,7 +68,7 @@ Example `/etc/achelous/spring.json`
         "Email": ""
       },
       "Subject": "ACHELOUS SPRING DEBUG MESSAGE",
-      "Body": "Activity: %[1]s\nReference: %[2]s\nError: %[3]s\nData: %[4]v"
+      "Body": "Activity: %[1]s\nReference: %[2]s\nError: %[3]s\nData: %+[4]v"
     }
   }
 }
