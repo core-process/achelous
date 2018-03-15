@@ -8,6 +8,7 @@ import (
 
 	"github.com/core-process/achelous/spring-core/args"
 	"github.com/core-process/achelous/spring-core/config"
+	"github.com/core-process/achelous/spring-core/debug"
 	"github.com/core-process/achelous/spring-core/programs"
 )
 
@@ -29,7 +30,8 @@ func main() {
 	// parse arguments
 	program, smArgs, mqArgs, values, err := args.Parse(os.Args)
 	if err != nil {
-		log.Println(err)
+		log.Printf("failed to parse arguments: %v", err)
+		debug.MailOn(debug.InvalidParameters, cdata, nil, err, nil)
 		os.Exit(1)
 	}
 

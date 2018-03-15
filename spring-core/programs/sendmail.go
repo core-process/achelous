@@ -14,6 +14,7 @@ import (
 	"github.com/core-process/achelous/common/queue"
 	"github.com/core-process/achelous/spring-core/args"
 	"github.com/core-process/achelous/spring-core/config"
+	"github.com/core-process/achelous/spring-core/debug"
 
 	"github.com/jhillyerd/enmime"
 	"github.com/oklog/ulid"
@@ -75,16 +76,24 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 	// parse envelope
 	envelope, err := enmime.ReadEnvelope(filterReader)
 	if err != nil {
+		debug.MailOn(debug.OtherErrors, cdata, nil, err, nil)
 		return err
 	}
 
 	// check for parsing errors
 	if len(envelope.Errors) > 0 {
+		// create error
 		errMsg := "Parsing failed:"
 		for _, v := range envelope.Errors {
 			errMsg += "\n- " + v.String()
 		}
-		return errors.New(errMsg)
+		err = errors.New(errMsg)
+		// handle error
+		debug.MailOn(debug.ParsingErrors, cdata, nil, err, nil)
+		if cdata.AbortOnParseErrors {
+			return err
+		}
+		log.Printf("Ignoring parse errors: %v", err)
 	}
 
 	// feed values from args to from and to
@@ -105,6 +114,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 	// create message
 	msgID, err := ulid.New(ulid.Now(), rand.Reader)
 	if err != nil {
+		debug.MailOn(debug.OtherErrors, cdata, nil, err, nil)
 		return err
 	}
 
@@ -139,7 +149,11 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 			}
 		}
 		if err != nil {
-			return err
+			debug.MailOn(debug.ParsingErrors, cdata, nil, err, nil)
+			if cdata.AbortOnParseErrors {
+				return err
+			}
+			log.Printf("Ignoring parse errors: %v", err)
 		}
 		message.Timestamp = timestamp
 	} else {
@@ -155,7 +169,11 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 				Email: "",
 			}
 		} else if err != nil {
-			return err
+			debug.MailOn(debug.ParsingErrors, cdata, nil, err, nil)
+			if cdata.AbortOnParseErrors {
+				return err
+			}
+			log.Printf("Ignoring parse errors: %v", err)
 		} else {
 			for _, address := range addresses {
 				message.Participants.From = &queue.Participant{
@@ -179,7 +197,11 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 				},
 			)
 		} else if err != nil {
-			return err
+			debug.MailOn(debug.ParsingErrors, cdata, nil, err, nil)
+			if cdata.AbortOnParseErrors {
+				return err
+			}
+			log.Printf("Ignoring parse errors: %v", err)
 		} else {
 			for _, address := range addresses {
 				message.Participants.To = append(
@@ -221,6 +243,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 		cdata.PrettyJSON,
 	)
 	if err != nil {
+		debug.MailOn(debug.OtherErrors, cdata, nil, err, nil)
 		return err
 	}
 

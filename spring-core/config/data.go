@@ -10,7 +10,7 @@ type Config struct {
 	PrettyJSON         bool
 	TriggerQueueRun    bool
 	GenerateDebugMail  struct {
-		OnUnknownParameters bool
+		OnInvalidParameters bool
 		OnParsingErrors     bool
 		OnOtherErrors       bool
 		Message             struct {
