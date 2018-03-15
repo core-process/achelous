@@ -154,6 +154,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 				return err
 			}
 			log.Printf("Ignoring parse errors: %v", err)
+			timestamp = time.Now()
 		}
 		message.Timestamp = timestamp
 	} else {
@@ -174,6 +175,10 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 				return err
 			}
 			log.Printf("Ignoring parse errors: %v", err)
+			message.Participants.From = &queue.Participant{
+				Name:  envelope.GetHeader("From"),
+				Email: "",
+			}
 		} else {
 			for _, address := range addresses {
 				message.Participants.From = &queue.Participant{
@@ -202,6 +207,13 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 				return err
 			}
 			log.Printf("Ignoring parse errors: %v", err)
+			message.Participants.To = append(
+				message.Participants.To,
+				queue.Participant{
+					Name:  envelope.GetHeader("To"),
+					Email: "",
+				},
+			)
 		} else {
 			for _, address := range addresses {
 				message.Participants.To = append(
