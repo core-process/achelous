@@ -5,15 +5,19 @@ import (
 )
 
 type Config struct {
-	DefaultQueue      string
-	PrettyJSON        bool
-	TriggerQueueRun   bool
-	GenerateDebugMail struct {
+	AbortOnParseErrors bool
+	DefaultQueue       string
+	PrettyJSON         bool
+	TriggerQueueRun    bool
+	GenerateDebugMail  struct {
 		OnUnknownParameters bool
 		OnParsingErrors     bool
-		OnEmptyInput        bool
-		OnOtherError        bool
-		Sender              queue.Participant
-		Receiver            queue.Participant
+		OnOtherErrors       bool
+		Message             struct {
+			Sender   queue.Participant
+			Receiver queue.Participant
+			Subject  string
+			Body     string
+		}
 	}
 }

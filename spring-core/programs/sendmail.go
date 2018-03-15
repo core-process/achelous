@@ -102,7 +102,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 		envelope.Root.Header.Set("To", strings.Join(recipients, ", "))
 	}
 
-	// create message structure
+	// create message
 	msgID, err := ulid.New(ulid.Now(), rand.Reader)
 	if err != nil {
 		return err
@@ -113,7 +113,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 	message.Participants.To = []queue.Participant{}
 	message.Attachments = []queue.Attachment{}
 
-	// extract timestamp
+	// extract "timestamp"
 	dateStr := envelope.GetHeader("Date")
 	if len(dateStr) > 0 {
 		formats := []string{
@@ -146,7 +146,7 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 		message.Timestamp = time.Now()
 	}
 
-	// extract from
+	// extract "from"
 	addresses, err := envelope.AddressList("From")
 	if err != mail.ErrHeaderNotPresent {
 		if err != nil && err.Error() == "mail: no angle-addr" {
@@ -165,10 +165,9 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 				break
 			}
 		}
-
 	}
 
-	// extract to
+	// extract "to"
 	addresses, err = envelope.AddressList("To")
 	if err != mail.ErrHeaderNotPresent {
 		if err != nil && err.Error() == "mail: no angle-addr" {
@@ -194,14 +193,14 @@ func Sendmail(cdata *config.Config, smArgs *args.SmArgs, recipients []string) er
 		}
 	}
 
-	// extract subject
+	// extract "subject"
 	message.Subject = envelope.GetHeader("Subject")
 
-	// extract message body
+	// extract "body"
 	message.Body.Text = envelope.Text
 	message.Body.HTML = envelope.HTML
 
-	// extract attachment data
+	// extract "attachments"
 	for _, attachment := range envelope.Attachments {
 		message.Attachments = append(
 			message.Attachments,
