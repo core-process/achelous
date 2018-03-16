@@ -55,9 +55,9 @@ Example `/etc/achelous/spring.json`
   "PrettyJSON": false,
   "TriggerQueueRun": true,
   "GenerateDebugMail": {
-    "OnInvalidParameters": false,
-    "OnParsingErrors": false,
-    "OnOtherErrors": false,
+    "OnInvalidParameters": true,
+    "OnParsingErrors": true,
+    "OnOtherErrors": true,
     "Message": {
       "Sender": {
         "Name": "Achelous Spring",
@@ -68,7 +68,7 @@ Example `/etc/achelous/spring.json`
         "Email": ""
       },
       "Subject": "ACHELOUS SPRING DEBUG MESSAGE",
-      "Body": "Activity: %[1]s\nReference: %[2]s\nError: %[3]s\nData: %+[4]v"
+      "Body": "Activity: %[1]s\nReference: %[2]s\nError: %[3]v\nData: %+[4]v"
     }
   }
 }
@@ -109,14 +109,17 @@ Submit emails exactly as before, e.g.
 
 ```sh
 
-echo "Lorem body..." | mail -r "sender@mail.com" -s "Lorem subject..." "receiver@mail.com"
-
+# EXAMPLE 1
 sendmail -i "receiver@mail.com" <<EOF
 Subject: Lorem subject...
 From: sender@mail.com
 
 Lorem body...
 EOF
+
+# EXAMPLE 2
+# requires the GNU mail command (apt-get install mailutils)
+echo "Lorem body..." | mail -r "sender@mail.com" -s "Lorem subject..." "receiver@mail.com"
 
 ```
 

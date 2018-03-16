@@ -18,9 +18,9 @@ func Load() (*Config, error) {
 	data.PrettyJSON = false
 	data.TriggerQueueRun = true
 
-	data.GenerateDebugMail.OnInvalidParameters = false
-	data.GenerateDebugMail.OnParsingErrors = false
-	data.GenerateDebugMail.OnOtherErrors = false
+	data.GenerateDebugMail.OnInvalidParameters = true
+	data.GenerateDebugMail.OnParsingErrors = true
+	data.GenerateDebugMail.OnOtherErrors = true
 	data.GenerateDebugMail.Message.Sender.Name = "Achelous Spring"
 	data.GenerateDebugMail.Message.Receiver.Name = "Devops"
 	data.GenerateDebugMail.Message.Subject = "ACHELOUS SPRING DEBUG MESSAGE"
