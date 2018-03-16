@@ -1,5 +1,5 @@
-hash: ebad31c5769139d0ff5371fb3b3e9fca42934bc6b49bbf516cf839f02f0e2afa
-updated: 2018-03-12T03:02:33.503906651+01:00
+hash: 8302a98d546accb2edb70688f00fb862520226aef2468704ee5d75b2bf0979ad
+updated: 2018-03-16T17:05:56.816055315+01:00
 imports:
 - name: github.com/jaytaylor/html2text
   version: 190166da35878a77103b951ae035a473531c1fc2
@@ -20,11 +20,20 @@ imports:
   version: 6386211fdfcf24c0bfbdaceafd02849ed9a8a509
 - name: github.com/vrischmann/jsonutil
   version: d44b59f0575ca3785e670025e2488efe0a4a10c4
+- name: golang.org/x/crypto
+  version: b4956d363a8b14623cc81db401707679605930a3
+  subpackages:
+  - ssh/terminal
 - name: golang.org/x/net
   version: d25186b37f34ebdbbea8f488ef055638dfab272d
   subpackages:
   - html
   - html/atom
+- name: golang.org/x/sys
+  version: cc7307a45468e49eaf2997c890f14aa03a26917b
+  subpackages:
+  - unix
+  - windows
 - name: golang.org/x/text
   version: b7ef84aaf62aa3e70962625c80a571ae7c17cb40
   subpackages:

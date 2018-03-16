@@ -14,6 +14,8 @@ import (
 	"strings"
 	"time"
 
+	"golang.org/x/crypto/ssh/terminal"
+
 	commonConfig "github.com/core-process/achelous/common/config"
 	commonQueue "github.com/core-process/achelous/common/queue"
 	"github.com/core-process/achelous/spring-core/args"
@@ -21,10 +23,47 @@ import (
 
 func Mailq(mqArgs *args.MqArgs) error {
 
+	// detect terminal and disable line wrapping
+	isTerminal := terminal.IsTerminal(int(os.Stdout.Fd()))
+
+	if isTerminal {
+		_, err := os.Stdout.WriteString("\x1b[?7l")
+		if err != nil {
+			panic(err)
+		}
+	}
+
+	defer func() {
+		if isTerminal {
+			_, err := os.Stdout.WriteString("\x1b[?7h")
+			if err != nil {
+				panic(err)
+			}
+		}
+	}()
+
+	termBold := ""
+	termBlueBold := ""
+	termGreen := ""
+	termReset := ""
+
+	if isTerminal {
+		termBlueBold = "\033[34;1m"
+		termBold = "\033[1m"
+		termGreen = "\033[32m"
+		termReset = "\033[0m"
+	}
+
 	// pretty print queue header
 	printQueueHeader := func(queue string) {
-		out := "QUEUE: /%s\n\n"
-		_, err := fmt.Printf(out, queue)
+		if len(queue) == 0 {
+			queue = "[root]"
+		}
+		out := "\n%sQUEUE: %s%s\n\n"
+		_, err := fmt.Printf(
+			out,
+			termBlueBold, queue, termReset,
+		)
 		if err != nil {
 			panic(err)
 		}
@@ -76,19 +115,17 @@ func Mailq(mqArgs *args.MqArgs) error {
 			}
 		}
 
-		out := " %4s %4s %s\n" +
-			strings.Repeat(" ", 11) + "From: %s\n" +
-			strings.Repeat(" ", 11) + "To: %s\n" +
-			strings.Repeat(" ", 11) + "Subject: %s\n\n"
+		out := "%s %4s %4s %s%s\n" +
+			strings.Repeat(" ", 11) + "%sFrom:%s %s\n" +
+			strings.Repeat(" ", 11) + "%sTo:%s %s\n" +
+			strings.Repeat(" ", 11) + "%sSubject:%s %s\n\n"
 
 		_, err := fmt.Printf(
 			out,
-			relTsStr,
-			size,
-			msg.ID.String(),
-			from,
-			strings.Join(to, ", "),
-			msg.Subject,
+			termBold, relTsStr, size, msg.ID.String(), termReset,
+			termGreen, termReset, from,
+			termGreen, termReset, strings.Join(to, ", "),
+			termGreen, termReset, msg.Subject,
 		)
 		if err != nil {
 			panic(err)
