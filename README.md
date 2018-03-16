@@ -79,8 +79,8 @@ Example `/etc/achelous/upstream.json`
 ```json
 {
   "PauseBetweenRuns": {
-    "PreviousRunOK": "60m",
-    "PreviousRunWithErrors": "1m"
+    "PreviousRunOK": "5m",
+    "PreviousRunWithErrors": "30s"
   },
   "Target": {
     "Upload": {
@@ -97,11 +97,13 @@ Example `/etc/achelous/upstream.json`
     },
     "RetriesPerRun": {
       "Attempts": 3,
-      "PauseBetweenAttempts": "10s"
+      "PauseBetweenAttempts": "5s"
     }
   }
 }
 ```
+
+**Note:** You might want to increase `PauseBetweenRuns.PreviousRunOK` significantly in some IoT scenarios, e.g. `1h` or more.
 
 ## Usage
 

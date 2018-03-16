@@ -1,6 +1,6 @@
 {
 	"PauseBetweenRuns": {
-		"PreviousRunOK": "2m",
+		"PreviousRunOK": "5m",
 		"PreviousRunWithErrors": "30s"
 	},
 	"Target": {
@@ -14,7 +14,7 @@
 		},
 		"RetriesPerRun": {
 			"Attempts": 3,
-			"PauseBetweenAttempts": "10s"
+			"PauseBetweenAttempts": "5s"
 		}
 	}
 }
