@@ -1,3 +1,9 @@
+achelous (1.2.0-1) stable; urgency=low
+
+  * Add mailq implementation.
+
+ -- Niklas Salmoukas <niklas@salmoukas.com>  Fri, 16 Mar 2018 14:02:08 +0100
+
 achelous (1.1.0-1) stable; urgency=low
 
   * New debugging feature: generate debug message when error occurs.
