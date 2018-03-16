@@ -16,27 +16,25 @@ The project is split into two programs:
 - URL and header variables of target web service are freely configurable.
 - Reports successfully processed queues to the web service. Allows the implementation of a health check.
 
-## Building
-
-**Note:** Pre-built packages are available [here](https://github.com/core-process/achelous/releases). Have a look and skip this section, if you find the appropriate `deb` file for your architecture.
-
-Make sure the following tools are available in your `PATH`:
-
-- `make`
-- `gcc`
-- `go`
-- `glide`
-- `dpkg-deb` (for packaging)
-
-Run `make` to build the binaries from source. The binaries will be placed in the `.build/bin` directoriy.
-
-Run `make dist` to build the package file. The `deb` file will be placed in the `.build/dist` directory.
-
 ## Installation
 
-Achelous conflicts with all packages providing the virtual `mail-transport-agent` package, e.g. `exim4-daemon-light`. Please remove them first.
+Achelous conflicts with all packages providing the virtual `mail-transport-agent` package, e.g. `exim4-daemon-light`. To be save, please remove them first.
 
-Download or build the package file. Install achelous with `sudo dpkg -i achelous_*.deb`.
+```sh
+# add repository
+echo "deb [arch=amd64,armhf] https://core-process.github.io/achelous-dist/deb $(lsb_release -s -c) main" | sudo tee /etc/apt/sources.list.d/achelous.list
+
+# add key of maintainer
+sudo apt-key adv --keyserver hkp://keys.gnupg.net --recv C7192F40A7C34E5A25339476D1E482C66415ACC5
+
+# update package index
+sudo apt-get update
+
+# install achelous
+sudo apt-get install achelous
+```
+
+See [here](https://github.com/core-process/achelous-dist) for more.
 
 Create and adjust the configuration files `/etc/achelous/spring.json` and `/etc/achelous/upstream.json`.
 
@@ -157,3 +155,21 @@ We provide the following example of the request body for your convenience. You w
 ```
 
 The reporting request is performed on successful queue runs only. The request body is empty.
+
+## Building
+
+**Note:** Pre-built packages are available [here](https://github.com/core-process/achelous/releases). Have a look and skip this section, if you find the appropriate `deb` file for your architecture.
+
+Make sure the following tools are available in your `PATH`:
+
+- `make`
+- `gcc`
+- `go`
+- `glide`
+- `dpkg-deb` (for packaging)
+
+Run `make` to build the binaries from source. The binaries will be placed in the `.build/bin` directoriy.
+
+Run `make dist` to build the package file. The `deb` file will be placed in the `.build/dist` directory.
+
+Install achelous with `sudo dpkg -i achelous_*.deb`.
