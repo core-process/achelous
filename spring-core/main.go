@@ -36,11 +36,17 @@ func main() {
 	}
 
 	// run sub programs
-	switch program {
-	case args.ArgProgramSendmail:
-		err = programs.Sendmail(cdata, smArgs, values)
-	case args.ArgProgramMailq:
+	if program == args.ArgProgramSendmail && smArgs.Arg_bp {
+		mqArgs = new(args.MqArgs)
+		mqArgs.Arg_v = smArgs.Arg_v
 		err = programs.Mailq(mqArgs)
+	} else {
+		switch program {
+		case args.ArgProgramSendmail:
+			err = programs.Sendmail(cdata, smArgs, values)
+		case args.ArgProgramMailq:
+			err = programs.Mailq(mqArgs)
+		}
 	}
 
 	if err != nil {
