@@ -49,11 +49,11 @@ func Mailq(mqArgs *args.MqArgs) error {
 		relTs := refTime.Sub(msg.Timestamp)
 		relTsStr := ""
 		if relTs >= time.Hour {
-			relTsStr = strconv.FormatInt(int64(math.Ceil(float64(relTs)/float64(time.Hour))), 10) + "h"
+			relTsStr = strconv.FormatInt(int64(math.Floor(float64(relTs)/float64(time.Hour))), 10) + "h"
 		} else if relTs >= time.Minute {
-			relTsStr = strconv.FormatInt(int64(math.Ceil(float64(relTs)/float64(time.Minute))), 10) + "m"
+			relTsStr = strconv.FormatInt(int64(math.Floor(float64(relTs)/float64(time.Minute))), 10) + "m"
 		} else {
-			relTsStr = strconv.FormatInt(int64(math.Ceil(float64(relTs)/float64(time.Second))), 10) + "s"
+			relTsStr = strconv.FormatInt(int64(math.Floor(float64(relTs)/float64(time.Second))), 10) + "s"
 		}
 
 		size := ""
