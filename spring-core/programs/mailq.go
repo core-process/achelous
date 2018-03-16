@@ -76,7 +76,11 @@ func Mailq(mqArgs *args.MqArgs) error {
 			}
 		}
 
-		out := " %4s %4s %s %s\n" + strings.Repeat(" ", 11) + "%s\n\n"
+		out := " %4s %4s %s\n" +
+			strings.Repeat(" ", 11) + "From: %s\n" +
+			strings.Repeat(" ", 11) + "To: %s\n" +
+			strings.Repeat(" ", 11) + "Subject: %s\n\n"
+
 		_, err := fmt.Printf(
 			out,
 			relTsStr,
@@ -84,6 +88,7 @@ func Mailq(mqArgs *args.MqArgs) error {
 			msg.ID.String(),
 			from,
 			strings.Join(to, ", "),
+			msg.Subject,
 		)
 		if err != nil {
 			panic(err)
