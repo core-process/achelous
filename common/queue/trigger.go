@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"syscall"
 
-	"github.com/core-process/achelous/common/config"
+	"github.com/coreprocess/achelous/common/config"
 
 	ps "github.com/mitchellh/go-ps"
 )

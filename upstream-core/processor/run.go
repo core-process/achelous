@@ -9,9 +9,9 @@ import (
 	"strings"
 	"sync"
 
-	commonConfig "github.com/core-process/achelous/common/config"
-	commonQueue "github.com/core-process/achelous/common/queue"
-	config "github.com/core-process/achelous/upstream-core/config"
+	commonConfig "github.com/coreprocess/achelous/common/config"
+	commonQueue "github.com/coreprocess/achelous/common/queue"
+	config "github.com/coreprocess/achelous/upstream-core/config"
 
 	"github.com/oklog/ulid"
 )

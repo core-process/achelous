@@ -3,7 +3,7 @@ package queue
 import (
 	"path"
 
-	"github.com/core-process/achelous/common/config"
+	"github.com/coreprocess/achelous/common/config"
 
 	"github.com/oklog/ulid"
 )

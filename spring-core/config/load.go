@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	commonConfig "github.com/core-process/achelous/common/config"
+	commonConfig "github.com/coreprocess/achelous/common/config"
 )
 
 func Load() (*Config, error) {

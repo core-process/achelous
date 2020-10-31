@@ -1,5 +1,5 @@
 # package
-PACKAGE = github.com/core-process/achelous
+PACKAGE = github.com/coreprocess/achelous
 
 # directories
 SRC = .build/src/$(PACKAGE)

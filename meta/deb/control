@@ -7,7 +7,7 @@ Depends: adduser, libc6, lsb-base
 Replaces: mail-transport-agent
 Provides: mail-transport-agent
 Maintainer: Niklas Salmoukas <niklas@salmoukas.com>
-Homepage: https://github.com/core-process/achelous
+Homepage: https://github.com/coreprocess/achelous
 Description: Sendmail replacement, which queues and uploads
  emails to a web service. We designed it for IoT devices and
  containers, which might send emails for administrative

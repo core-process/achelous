@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	commonConfig "github.com/core-process/achelous/common/config"
+	commonConfig "github.com/coreprocess/achelous/common/config"
 
 	"github.com/vrischmann/jsonutil"
 )

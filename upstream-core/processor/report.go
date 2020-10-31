@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/core-process/achelous/upstream-core/config"
+	"github.com/coreprocess/achelous/upstream-core/config"
 )
 
 func report(cdata *config.Config, OK bool) error {

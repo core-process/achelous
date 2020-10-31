@@ -8,8 +8,8 @@ import (
 	"os"
 	"time"
 
-	commonQueue "github.com/core-process/achelous/common/queue"
-	"github.com/core-process/achelous/upstream-core/config"
+	commonQueue "github.com/coreprocess/achelous/common/queue"
+	"github.com/coreprocess/achelous/upstream-core/config"
 
 	"github.com/oklog/ulid"
 )

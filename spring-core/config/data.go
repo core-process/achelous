@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/core-process/achelous/common/queue"
+	"github.com/coreprocess/achelous/common/queue"
 )
 
 type Config struct {

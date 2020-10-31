@@ -6,10 +6,10 @@ import (
 	"log/syslog"
 	"os"
 
-	"github.com/core-process/achelous/spring-core/args"
-	"github.com/core-process/achelous/spring-core/config"
-	"github.com/core-process/achelous/spring-core/debug"
-	"github.com/core-process/achelous/spring-core/programs"
+	"github.com/coreprocess/achelous/spring-core/args"
+	"github.com/coreprocess/achelous/spring-core/config"
+	"github.com/coreprocess/achelous/spring-core/debug"
+	"github.com/coreprocess/achelous/spring-core/programs"
 )
 
 func main() {

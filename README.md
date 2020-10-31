@@ -22,7 +22,7 @@ Achelous conflicts with all packages providing the virtual `mail-transport-agent
 
 ```sh
 # add repository
-echo "deb [arch=amd64,armhf] https://core-process.github.io/achelous-dist/deb $(lsb_release -s -c) main" | sudo tee /etc/apt/sources.list.d/achelous.list
+echo "deb [arch=amd64,armhf] https://coreprocess.github.io/achelous-dist/deb $(lsb_release -s -c) main" | sudo tee /etc/apt/sources.list.d/achelous.list
 
 # add key of maintainer
 sudo apt-key adv --keyserver hkp://keys.gnupg.net --recv C7192F40A7C34E5A25339476D1E482C66415ACC5
@@ -34,7 +34,7 @@ sudo apt-get update
 sudo apt-get install achelous
 ```
 
-See [here](https://github.com/core-process/achelous-dist) for more.
+See [here](https://github.com/coreprocess/achelous-dist) for more.
 
 Create and adjust the configuration files `/etc/achelous/spring.json` and `/etc/achelous/upstream.json`.
 
@@ -158,7 +158,7 @@ The reporting request is performed on successful queue runs only. The request bo
 
 ## Building
 
-**Note:** Pre-built packages are available [here](https://github.com/core-process/achelous/releases). Have a look and skip this section, if you find the appropriate `deb` file for your architecture.
+**Note:** Pre-built packages are available [here](https://github.com/coreprocess/achelous/releases). Have a look and skip this section, if you find the appropriate `deb` file for your architecture.
 
 Make sure the following tools are available in your `PATH`:
 

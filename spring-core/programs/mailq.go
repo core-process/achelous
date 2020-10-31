@@ -16,9 +16,9 @@ import (
 
 	"golang.org/x/crypto/ssh/terminal"
 
-	commonConfig "github.com/core-process/achelous/common/config"
-	commonQueue "github.com/core-process/achelous/common/queue"
-	"github.com/core-process/achelous/spring-core/args"
+	commonConfig "github.com/coreprocess/achelous/common/config"
+	commonQueue "github.com/coreprocess/achelous/common/queue"
+	"github.com/coreprocess/achelous/spring-core/args"
 )
 
 func Mailq(mqArgs *args.MqArgs) error {

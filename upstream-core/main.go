@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/core-process/achelous/upstream-core/config"
-	"github.com/core-process/achelous/upstream-core/processor"
+	"github.com/coreprocess/achelous/upstream-core/config"
+	"github.com/coreprocess/achelous/upstream-core/processor"
 )
 
 func main() {

@@ -6,8 +6,8 @@ import (
 	"log"
 	"time"
 
-	"github.com/core-process/achelous/common/queue"
-	"github.com/core-process/achelous/spring-core/config"
+	"github.com/coreprocess/achelous/common/queue"
+	"github.com/coreprocess/achelous/spring-core/config"
 
 	"github.com/oklog/ulid"
 )
